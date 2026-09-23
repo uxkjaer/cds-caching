@@ -71,31 +71,7 @@ context plugin.cds_caching {
 }
 
 annotate plugin.cds_caching.CachingApiService.Caches with @(
-    UI.LineItem      : [
-        {
-            $Type: 'UI.DataField',
-            Value: name,
-        },
-        {
-            $Type: 'UI.DataField',
-            Value: metricsEnabled,
-        },
-        {
-            $Type: 'UI.DataField',
-            Value: keyMetricsEnabled,
-        },
-    ],
-    UI.Identification: [
-        {
-            $Type : 'UI.DataFieldForAction',
-            Action: 'plugin.cds_caching.CachingApiService.toggleMetrics',
-        },
-        {
-            $Type : 'UI.DataFieldForAction',
-            Action: 'plugin.cds_caching.CachingApiService.toggleKeyMetrics',
-        },
-    ],
-    UI.Facets        : [{
+    UI.Facets: [{
         $Type : 'UI.ReferenceFacet',
         Target: 'metrics/@UI.LineItem',
     }, ]

@@ -41,11 +41,11 @@ annotate S.Caches with @(
         }
     ],
     UI.Identification: [
-        { $Type: 'UI.DataFieldForAction', Action: 'plugin.cds_caching.CachingApiService.Caches/toggleMetrics',    Label: 'Toggle Metrics' },
-        { $Type: 'UI.DataFieldForAction', Action: 'plugin.cds_caching.CachingApiService.Caches/toggleKeyMetrics', Label: 'Toggle Key Metrics' },
-        { $Type: 'UI.DataFieldForAction', Action: 'plugin.cds_caching.CachingApiService.Caches/clear',            Label: 'Clear Cache' },
-        { $Type: 'UI.DataFieldForAction', Action: 'plugin.cds_caching.CachingApiService.Caches/clearMetrics',     Label: 'Clear Metrics' },
-        { $Type: 'UI.DataFieldForAction', Action: 'plugin.cds_caching.CachingApiService.Caches/clearKeyMetrics',  Label: 'Clear Key Metrics' }
+        { $Type: 'UI.DataFieldForAction', Action: 'plugin.cds_caching.CachingApiService.toggleMetrics',    Label: 'Toggle Metrics' },
+        { $Type: 'UI.DataFieldForAction', Action: 'plugin.cds_caching.CachingApiService.toggleKeyMetrics', Label: 'Toggle Key Metrics' },
+        { $Type: 'UI.DataFieldForAction', Action: 'plugin.cds_caching.CachingApiService.clear',            Label: 'Clear Cache' },
+        { $Type: 'UI.DataFieldForAction', Action: 'plugin.cds_caching.CachingApiService.clearMetrics',     Label: 'Clear Metrics' },
+        { $Type: 'UI.DataFieldForAction', Action: 'plugin.cds_caching.CachingApiService.clearKeyMetrics',  Label: 'Clear Key Metrics' }
     ],
     UI.Facets: []
 );
