@@ -1,0 +1,9 @@
+{
+    "name": "cds.plugin.caching.dashboardfe",
+    "version": "1.0.0",
+    "private": true,
+    "devDependencies": {
+        "@ui5/cli": "^4.0.8",
+        "ui5-middleware-cap": "^3.3.0"
+    }
+}

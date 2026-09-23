@@ -56,7 +56,7 @@ annotate S.Metrics with @(
     UI.HeaderInfo: {
         TypeName      : 'Metric',
         TypeNamePlural: 'Metrics',
-        Title         : { Value: ID }
+        Title         : { Value: timestamp }
     },
     UI.LineItem: [
         { $Type: 'UI.DataField', Value: timestamp,             Label: 'Timestamp' },
