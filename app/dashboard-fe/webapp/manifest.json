@@ -1,0 +1,133 @@
+{
+    "_version": "1.12.0",
+    "sap.app": {
+        "id": "cds.plugin.caching.dashboardfe",
+        "type": "application",
+        "title": "CDS Caching Dashboard",
+        "description": "Fiori Elements caching dashboard",
+        "applicationVersion": { "version": "1.0.0" },
+        "dataSources": {
+            "caching": {
+                "uri": "/odata/v4/caching-api/",
+                "type": "OData",
+                "settings": { "odataVersion": "4.0" }
+            }
+        }
+    },
+    "sap.ui": {
+        "technology": "UI5",
+        "deviceTypes": { "desktop": true, "tablet": true, "phone": true }
+    },
+    "sap.ui5": {
+        "dependencies": {
+            "minUI5Version": "1.148.10",
+            "libs": {
+                "sap.fe.templates": {},
+                "sap.fe.macros": {},
+                "sap.m": {},
+                "sap.ui.core": {},
+                "sap.suite.ui.microchart": {}
+            }
+        },
+        "models": {
+            "": {
+                "dataSource": "caching",
+                "settings": { "autoExpandSelect": true }
+            },
+            "i18n": {
+                "type": "sap.ui.model.resource.ResourceModel",
+                "settings": { "bundleName": "cds.plugin.caching.dashboardfe.i18n.i18n" }
+            }
+        },
+        "contentDensities": { "compact": true, "cozy": true },
+        "routing": {
+            "routes": [
+                {
+                    "pattern": "",
+                    "name": "CachesList",
+                    "target": "CachesList"
+                },
+                {
+                    "pattern": "Caches({key})",
+                    "name": "CachesObjectPage",
+                    "target": "CachesObjectPage"
+                },
+                {
+                    "pattern": "Caches({key})/metrics({metricsKey})",
+                    "name": "MetricsObjectPage",
+                    "target": "MetricsObjectPage"
+                }
+            ],
+            "targets": {
+                "CachesList": {
+                    "type": "Component",
+                    "id": "CachesList",
+                    "name": "sap.fe.templates.ListReport",
+                    "options": {
+                        "settings": {
+                            "entitySet": "Caches",
+                            "contextPath": "/Caches"
+                        }
+                    }
+                },
+                "CachesObjectPage": {
+                    "type": "Component",
+                    "id": "CachesObjectPage",
+                    "name": "sap.fe.templates.ObjectPage",
+                    "options": {
+                        "settings": {
+                            "entitySet": "Caches",
+                            "contextPath": "/Caches",
+                            "content": {
+                                "body": {
+                                    "sections": {
+                                        "OverviewSection": {
+                                            "title": "{i18n>tabOverview}",
+                                            "template": "cds.plugin.caching.dashboardfe.ext.Overview",
+                                            "position": { "placement": "Before", "anchor": "GeneralInformationSection" }
+                                        },
+                                        "MetricsSection": {
+                                            "title": "{i18n>tabMetrics}",
+                                            "template": "cds.plugin.caching.dashboardfe.ext.MetricsSection",
+                                            "position": { "placement": "After", "anchor": "OverviewSection" }
+                                        },
+                                        "KeyMetricsSection": {
+                                            "title": "{i18n>tabKeyMetrics}",
+                                            "template": "cds.plugin.caching.dashboardfe.ext.KeyMetricsSection",
+                                            "position": { "placement": "After", "anchor": "MetricsSection" }
+                                        },
+                                        "EntriesSection": {
+                                            "title": "{i18n>tabEntries}",
+                                            "template": "cds.plugin.caching.dashboardfe.ext.EntriesSection",
+                                            "position": { "placement": "After", "anchor": "KeyMetricsSection" }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "MetricsObjectPage": {
+                    "type": "Component",
+                    "id": "MetricsObjectPage",
+                    "name": "sap.fe.templates.ObjectPage",
+                    "options": {
+                        "settings": {
+                            "entitySet": "Caches",
+                            "contextPath": "/Caches/metrics"
+                        }
+                    }
+                }
+            }
+        },
+        "extends": {
+            "extensions": {
+                "sap.ui.controllerExtensions": {
+                    "sap.fe.templates.ObjectPage.ObjectPageController": {
+                        "controllerName": "cds.plugin.caching.dashboardfe.ext.ObjectPageExtension"
+                    }
+                }
+            }
+        }
+    }
+}
