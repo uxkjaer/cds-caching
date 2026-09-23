@@ -2,6 +2,7 @@ using { plugin.cds_caching.CachingApiService as S } from '../../index';
 
 // List Report
 annotate S.Caches with @(
+    Common.SemanticKey: [name],
     UI.SelectionFields: [name, metricsEnabled, keyMetricsEnabled],
     UI.LineItem: [
         { $Type: 'UI.DataField', Value: name,              Label: 'Name' },
@@ -53,6 +54,7 @@ annotate S.Caches with @(
 // ─── METRICS TABLE ───────────────────────────────────────────────────────────
 
 annotate S.Metrics with @(
+    Common.SemanticKey: [ID, cache],
     UI.HeaderInfo: {
         TypeName      : 'Metric',
         TypeNamePlural: 'Metrics',
