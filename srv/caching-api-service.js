@@ -102,9 +102,23 @@ class CachingApiService extends cds.ApplicationService {
     this.on("getEntry", async (req) => {
       const { key } = req.data;
       const cacheService = await this._connectToCache(req);
-      const value = await cacheService.get(key);
+      const raw = await cacheService.get(key);
+      if (raw === undefined || raw === null) return null;
+      // The cache iterator yields objects with .value/.timestamp/.tags; cacheService.get()
+      // returns the same wrapper when available, or the raw value for plain stores.
+      if (raw !== null && typeof raw === "object" && "value" in raw) {
+        return {
+          entryKey: key,
+          value: JSON.stringify(raw.value),
+          timestamp: raw.timestamp ?? null,
+          tags: raw.tags ?? [],
+        };
+      }
       return {
-        value: value,
+        entryKey: key,
+        value: JSON.stringify(raw),
+        timestamp: null,
+        tags: [],
       };
     });
 

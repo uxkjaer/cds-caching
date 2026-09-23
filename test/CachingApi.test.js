@@ -102,14 +102,18 @@ describeFromCds(9, 'Caching API Service', () => {
                 await cache.set("test:get:entry", testValue);
 
                 const { data } = await GET('/odata/v4/caching-api/Caches(\'caching\')/getEntry(key=\'test:get:entry\')');
-                
-                expect(data.value).to.deep.equal(testValue);
+
+                expect(data).to.have.property('entryKey', 'test:get:entry');
+                expect(data).to.have.property('value');
+                expect(data).to.have.property('timestamp');
+                expect(data).to.have.property('tags');
+                expect(JSON.parse(data.value)).to.deep.equal(testValue);
             })
 
             it("should return undefined for non-existent entry", async () => {
                 const { data } = await GET('/odata/v4/caching-api/Caches(\'caching\')/getEntry(key=\'non:existent:entry\')');
-                
-                expect(data.value).to.be.undefined;
+
+                expect(data.value).to.not.exist;
             })
 
             it("should handle complex objects", async () => {
@@ -125,12 +129,14 @@ describeFromCds(9, 'Caching API Service', () => {
                         }
                     }
                 };
-                
+
                 await cache.set("complex:entry", complexObject);
 
                 const { data } = await GET('/odata/v4/caching-api/Caches(\'caching\')/getEntry(key=\'complex:entry\')');
-                
-                expect(data.value).to.deep.equal(complexObject);
+
+                expect(data).to.have.property('entryKey', 'complex:entry');
+                expect(data).to.have.property('value');
+                expect(JSON.parse(data.value)).to.deep.equal(complexObject);
             })
         })
 
@@ -310,10 +316,10 @@ describeFromCds(9, 'Caching API Service', () => {
 
     describe('Metrics Management', () => {
 
-        describe('setMetricsEnabled', () => {
+        describe('toggleMetrics', () => {
 
             it("should enable metrics", async () => {
-                const { data } = await POST('/odata/v4/caching-api/Caches(\'caching\')/setMetricsEnabled', {
+                const { data } = await POST('/odata/v4/caching-api/Caches(\'caching\')/toggleMetrics', {
                     enabled: true
                 });
 
@@ -328,7 +334,7 @@ describeFromCds(9, 'Caching API Service', () => {
                 // Enable first
                 await cache.setMetricsEnabled(true);
 
-                const { data } = await POST('/odata/v4/caching-api/Caches(\'caching\')/setMetricsEnabled', {
+                const { data } = await POST('/odata/v4/caching-api/Caches(\'caching\')/toggleMetrics', {
                     enabled: false
                 });
 
@@ -341,10 +347,10 @@ describeFromCds(9, 'Caching API Service', () => {
 
         })
 
-        describe('setKeyMetricsEnabled', () => {
+        describe('toggleKeyMetrics', () => {
 
             it("should enable key metrics", async () => {
-                const { data } = await POST('/odata/v4/caching-api/Caches(\'caching\')/setKeyMetricsEnabled', {
+                const { data } = await POST('/odata/v4/caching-api/Caches(\'caching\')/toggleKeyMetrics', {
                     enabled: true
                 });
 
@@ -359,7 +365,7 @@ describeFromCds(9, 'Caching API Service', () => {
                 // Enable first
                 await cache.setKeyMetricsEnabled(true);
 
-                const { data } = await POST('/odata/v4/caching-api/Caches(\'caching\')/setKeyMetricsEnabled', {
+                const { data } = await POST('/odata/v4/caching-api/Caches(\'caching\')/toggleKeyMetrics', {
                     enabled: false
                 });
 
@@ -682,7 +688,8 @@ describeFromCds(9, 'Caching API Service', () => {
 
             // 2. Get entry
             const { data: getData } = await GET('/odata/v4/caching-api/Caches(\'caching\')/getEntry(key=\'workflow:test\')');
-            expect(getData.value).to.equal("workflow value");
+            expect(getData).to.have.property('entryKey', 'workflow:test');
+            expect(JSON.parse(getData.value)).to.equal("workflow value");
 
             // 3. Get all entries
             const { data: entriesData } = await GET('/odata/v4/caching-api/Caches(\'caching\')/getEntries()');
@@ -690,7 +697,7 @@ describeFromCds(9, 'Caching API Service', () => {
             expect(entriesData.value[0].entryKey).to.equal("workflow:test");
 
             // 4. Enable metrics
-            await POST('/odata/v4/caching-api/Caches(\'caching\')/setMetricsEnabled', { enabled: true });
+            await POST('/odata/v4/caching-api/Caches(\'caching\')/toggleMetrics', { enabled: true });
 
             // 5. Check metrics
             const { data: metricsData } = await GET('/odata/v4/caching-api/Metrics?$filter=cache eq \'caching\'');
@@ -701,7 +708,7 @@ describeFromCds(9, 'Caching API Service', () => {
 
             // 7. Verify deletion
             const { data: deletedData } = await GET('/odata/v4/caching-api/Caches(\'caching\')/getEntry(key=\'workflow:test\')');
-            expect(deletedData.value).to.be.undefined;
+            expect(deletedData.value).to.not.exist;
         }, 10000)
     })
 }) 

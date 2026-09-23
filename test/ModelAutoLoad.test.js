@@ -94,7 +94,7 @@ describe('Model Auto-Loading', () => {
             expect(caches.actions).to.have.property('getEntries');
             expect(caches.actions).to.have.property('setEntry');
             expect(caches.actions).to.have.property('clear');
-            expect(caches.actions).to.have.property('setMetricsEnabled');
+            expect(caches.actions).to.have.property('toggleMetrics');
         })
 
         it('should expose Metrics and KeyMetrics as readonly projections', () => {
