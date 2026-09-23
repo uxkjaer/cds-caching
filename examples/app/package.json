@@ -23,6 +23,9 @@
   },
   "cds": {
     "requires": {
+      "auth": {
+        "kind": "dummy"
+      },
       "db": {
         "kind": "sqlite",
         "credentials": {

@@ -1,16 +1,20 @@
 {
-    "_version": "1.12.0",
+    "_version": "1.76.0",
     "sap.app": {
         "id": "cds.plugin.caching.dashboardfe",
         "type": "application",
-        "title": "CDS Caching Dashboard",
-        "description": "Fiori Elements caching dashboard",
+        "i18n": "i18n/i18n.properties",
         "applicationVersion": { "version": "1.0.0" },
+        "title": "{{appTitle}}",
+        "description": "{{appDescription}}",
         "dataSources": {
             "caching": {
                 "uri": "/odata/v4/caching-api/",
                 "type": "OData",
-                "settings": { "odataVersion": "4.0" }
+                "settings": {
+                    "annotations": [],
+                    "odataVersion": "4.0"
+                }
             }
         }
     },
@@ -19,6 +23,7 @@
         "deviceTypes": { "desktop": true, "tablet": true, "phone": true }
     },
     "sap.ui5": {
+        "flexEnabled": true,
         "dependencies": {
             "minUI5Version": "1.148.10",
             "libs": {
@@ -32,28 +37,38 @@
         "models": {
             "": {
                 "dataSource": "caching",
-                "settings": { "autoExpandSelect": true }
+                "preload": true,
+                "settings": {
+                    "operationMode": "Server",
+                    "autoExpandSelect": true,
+                    "earlyRequests": true
+                }
             },
             "i18n": {
                 "type": "sap.ui.model.resource.ResourceModel",
                 "settings": { "bundleName": "cds.plugin.caching.dashboardfe.i18n.i18n" }
+            },
+            "@i18n": {
+                "type": "sap.ui.model.resource.ResourceModel",
+                "uri": "i18n/i18n.properties"
             }
         },
         "contentDensities": { "compact": true, "cozy": true },
         "routing": {
+            "config": {},
             "routes": [
                 {
-                    "pattern": "",
+                    "pattern": ":?query:",
                     "name": "CachesList",
                     "target": "CachesList"
                 },
                 {
-                    "pattern": "Caches({key})",
+                    "pattern": "Caches({key}):?query:",
                     "name": "CachesObjectPage",
                     "target": "CachesObjectPage"
                 },
                 {
-                    "pattern": "Caches({key})/metrics({metricsKey})",
+                    "pattern": "Caches({key})/metrics({metricsKey}):?query:",
                     "name": "MetricsObjectPage",
                     "target": "MetricsObjectPage"
                 }
@@ -65,9 +80,23 @@
                     "name": "sap.fe.templates.ListReport",
                     "options": {
                         "settings": {
-                            "entitySet": "Caches",
                             "contextPath": "/Caches",
-                            "initialLoad": "Enabled"
+                            "variantManagement": "Page",
+                            "initialLoad": "Enabled",
+                            "navigation": {
+                                "Caches": {
+                                    "detail": {
+                                        "route": "CachesObjectPage"
+                                    }
+                                }
+                            },
+                            "controlConfiguration": {
+                                "@com.sap.vocabularies.UI.v1.LineItem": {
+                                    "tableSettings": {
+                                        "type": "ResponsiveTable"
+                                    }
+                                }
+                            }
                         }
                     }
                 },
@@ -77,7 +106,6 @@
                     "name": "sap.fe.templates.ObjectPage",
                     "options": {
                         "settings": {
-                            "entitySet": "Caches",
                             "contextPath": "/Caches",
                             "navigation": {
                                 "metrics": {
