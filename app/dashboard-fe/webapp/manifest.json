@@ -78,6 +78,13 @@
                         "settings": {
                             "entitySet": "Caches",
                             "contextPath": "/Caches",
+                            "navigation": {
+                                "metrics": {
+                                    "detail": {
+                                        "route": "MetricsObjectPage"
+                                    }
+                                }
+                            },
                             "content": {
                                 "body": {
                                     "sections": {
@@ -113,7 +120,7 @@
                     "name": "sap.fe.templates.ObjectPage",
                     "options": {
                         "settings": {
-                            "entitySet": "Caches",
+                            "entitySet": "Metrics",
                             "contextPath": "/Caches/metrics"
                         }
                     }
