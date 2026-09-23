@@ -1,8 +1,8 @@
-const cds = require('@sap/cds')
-const { isMultitenantMode } = require('../lib/support/MultitenancyDetector')
-const { isPluginModelAvailable } = require('../lib/util')
+const cds = require("@sap/cds");
+const { isMultitenantMode } = require("../lib/support/MultitenancyDetector");
+const { isPluginModelAvailable } = require("../lib/util");
 
-const DEFAULT_TENANT = '_default';
+const DEFAULT_TENANT = "_default";
 
 /** Upper bound for `getEntries`, regardless of the requested `top`. */
 const MAX_ENTRIES_PER_PAGE = 1000;
@@ -12,246 +12,247 @@ const DEFAULT_ENTRIES_PER_PAGE = 100;
 const MAX_ENTRY_VALUE_BYTES = 1024 * 1024;
 
 class CachingApiService extends cds.ApplicationService {
-    log = cds.log('cds-caching');
+  log = cds.log("cds-caching");
 
-    async init() {
-
-        // In MTX mode, lazily create cache entries on first dashboard / API access
-        // (skipped at startup because there's no tenant context)
-        if (isMultitenantMode()) {
-            this.before('READ', ['Caches', 'Metrics', 'KeyMetrics', 'TagMetrics'], async () => {
-                await this._ensureCacheEntries();
-            });
-        }
-
-        // Handle setMetricsEnabled action
-        this.on('setMetricsEnabled', async (req) => {
-            const { enabled } = req.data
-            const cacheService = await this._connectToCache(req);
-            const cache = this._cacheName(req);
-            try {
-                await cacheService.setMetricsEnabled(enabled)
-                req.info(`Metrics ${enabled ? 'enabled' : 'disabled'} for cache ${cache}`);
-                return true;
-            } catch (error) {
-                req.error(`Failed to set metrics enabled: ${error.message}`);
-                return false;
-            }
-        })
-
-        // Handle setKeyMetricsEnabled action
-        this.on('setKeyMetricsEnabled', async (req) => {
-            const { enabled } = req.data
-            const cacheService = await this._connectToCache(req);
-            const cache = this._cacheName(req);
-            try {
-                await cacheService.setKeyMetricsEnabled(enabled)
-                req.info(`Key metrics ${enabled ? 'enabled' : 'disabled'} for cache ${cache}`);
-                return true;
-            } catch (error) {
-                req.error(`Failed to set key metrics enabled: ${error.message}`);
-                return false;
-            }
-        })
-
-        // Handle setTagMetricsEnabled action
-        this.on('setTagMetricsEnabled', async (req) => {
-            const { enabled } = req.data
-            const cacheService = await this._connectToCache(req);
-            const cache = this._cacheName(req);
-            try {
-                await cacheService.setTagMetricsEnabled(enabled)
-                req.info(`Tag metrics ${enabled ? 'enabled' : 'disabled'} for cache ${cache}`);
-                return true;
-            } catch (error) {
-                req.error(`Failed to set tag metrics enabled: ${error.message}`);
-                return false;
-            }
-        })
-
-        // Handle getCacheEntries function
-        this.on('getEntries', async (req) => {
-            const cacheService = await this._connectToCache(req);
-            const { top, skip } = req.data;
-
-            // Bounded on purpose: an unbounded iteration would pull the whole
-            // cache into memory and can be used to exhaust the server.
-            const requested = Number.isInteger(top) && top > 0 ? top : DEFAULT_ENTRIES_PER_PAGE;
-            const limit = Math.min(requested, MAX_ENTRIES_PER_PAGE);
-            const offset = Number.isInteger(skip) && skip > 0 ? skip : 0;
-
-            try {
-                const entries = [];
-                let seen = 0;
-                for await (const [key, value] of cacheService.iterator()) {
-                    if (seen++ < offset) continue;
-                    entries.push({
-                        entryKey: key,
-                        value: JSON.stringify(value.value),
-                        timestamp: value.timestamp,
-                        tags: value.tags,
-                    });
-                    if (entries.length >= limit) break;
-                }
-                return entries;
-            } catch (error) {
-                req.error(`Failed to get cache entries: ${error.message}`);
-                return [];
-            }
-        });
-
-        // Handle getCacheEntry function
-        this.on('getEntry', async (req) => {
-            const { key } = req.data;
-            const cacheService = await this._connectToCache(req);
-            const value = await cacheService.get(key);
-            return {
-                value: value,
-            };
-        });
-
-        // Handle setCacheEntry action
-        this.on('setEntry', async (req) => {
-            const { key, value, ttl } = req.data;
-            const cacheService = await this._connectToCache(req);
-
-            const size = Buffer.byteLength(String(value ?? ''), 'utf8');
-            if (size > MAX_ENTRY_VALUE_BYTES) {
-                return req.reject(400, `Value exceeds the maximum of ${MAX_ENTRY_VALUE_BYTES} bytes (got ${size})`);
-            }
-
-            await cacheService.set(key, value, { ttl: ttl });
-            req.info(`Cache entry set successfully: ${key}`);
-            return true;
-        });
-
-        // Handle deleteCacheEntry action
-        this.on('deleteEntry', async (req) => {
-            const { key } = req.data;
-            const cacheService = await this._connectToCache(req);
-            await cacheService.delete(key);
-            req.info(`Cache entry deleted successfully: ${key}`);
-            return true;
-        });
-
-        // Handle clearCache action
-        this.on('clear', async (req) => {
-            const cacheService = await this._connectToCache(req);
-            const cache = this._cacheName(req);
-            await cacheService.clear();
-            req.info(`Cache cleared successfully: ${cache}`);
-            return true;
-        });
-
-        // Handle clearKeyMetrics action
-        this.on('clearKeyMetrics', async (req) => {
-            const cacheService = await this._connectToCache(req);
-            const cache = this._cacheName(req);
-            await cacheService.clearKeyMetrics();
-            req.info(`Key metrics cleared successfully: ${cache}`);
-            return true;
-        });
-
-        // Handle clearTagMetrics action
-        this.on('clearTagMetrics', async (req) => {
-            const cacheService = await this._connectToCache(req);
-            const cache = this._cacheName(req);
-            await cacheService.clearTagMetrics();
-            req.info(`Tag metrics cleared successfully: ${cache}`);
-            return true;
-        });
-
-        // Handle clearMetrics action
-        this.on('clearMetrics', async (req) => {
-            const cacheService = await this._connectToCache(req);
-            const cache = this._cacheName(req);
-            await cacheService.clearMetrics();
-            req.info(`Metrics cleared successfully: ${cache}`);
-            return true;
-        });
-
-        await super.init()
+  async init() {
+    // In MTX mode, lazily create cache entries on first dashboard / API access
+    // (skipped at startup because there's no tenant context)
+    if (isMultitenantMode()) {
+      this.before("READ", ["Caches", "Metrics", "KeyMetrics", "TagMetrics"], async () => {
+        await this._ensureCacheEntries();
+      });
     }
+    // Handle toggleMetrics action
+    this.on("toggleMetrics", async (req) => {
+      const { enabled } = req.data;
+      const cacheService = await this._connectToCache(req);
+      const cache = this._cacheName(req);
+      try {
+        await cacheService.setMetricsEnabled(enabled);
+        req.info(`Metrics ${enabled ? "enabled" : "disabled"} for cache ${cache}`);
+        return true;
+      } catch (error) {
+        req.error(`Failed to set metrics enabled: ${error.message}`);
+        return false;
+      }
+    });
 
-    /**
-     * Names of all configured cds-caching services. Used as an allow-list so a
-     * caller cannot coerce `cds.connect.to()` into connecting to an unrelated
-     * business service by passing its name as the cache key.
-     * @returns {Set<string>}
-     */
-    _allowedCaches() {
-        return new Set(
-            Object.entries(cds.env.requires || {})
-                .filter(([, config]) => config?.impl === 'cds-caching')
-                .map(([name]) => name)
+    // Handle toggleKeyMetrics action
+    this.on("toggleKeyMetrics", async (req) => {
+      const { enabled } = req.data;
+      const cacheService = await this._connectToCache(req);
+      const cache = this._cacheName(req);
+      try {
+        await cacheService.setKeyMetricsEnabled(enabled);
+        req.info(`Key metrics ${enabled ? "enabled" : "disabled"} for cache ${cache}`);
+        return true;
+      } catch (error) {
+        req.error(`Failed to set key metrics enabled: ${error.message}`);
+        return false;
+      }
+    });
+
+    // Handle setTagMetricsEnabled action
+    this.on("setTagMetricsEnabled", async (req) => {
+      const { enabled } = req.data;
+      const cacheService = await this._connectToCache(req);
+      const cache = this._cacheName(req);
+      try {
+        await cacheService.setTagMetricsEnabled(enabled);
+        req.info(`Tag metrics ${enabled ? "enabled" : "disabled"} for cache ${cache}`);
+        return true;
+      } catch (error) {
+        req.error(`Failed to set tag metrics enabled: ${error.message}`);
+        return false;
+      }
+    });
+
+    // Handle getCacheEntries function
+    this.on("getEntries", async (req) => {
+      const cacheService = await this._connectToCache(req);
+      const { top, skip } = req.data;
+
+      // Bounded on purpose: an unbounded iteration would pull the whole
+      // cache into memory and can be used to exhaust the server.
+      const requested = Number.isInteger(top) && top > 0 ? top : DEFAULT_ENTRIES_PER_PAGE;
+      const limit = Math.min(requested, MAX_ENTRIES_PER_PAGE);
+      const offset = Number.isInteger(skip) && skip > 0 ? skip : 0;
+
+      try {
+        const entries = [];
+        let seen = 0;
+        for await (const [key, value] of cacheService.iterator()) {
+          if (seen++ < offset) continue;
+          entries.push({
+            entryKey: key,
+            value: JSON.stringify(value.value),
+            timestamp: value.timestamp,
+            tags: value.tags,
+          });
+          if (entries.length >= limit) break;
+        }
+        return entries;
+      } catch (error) {
+        req.error(`Failed to get cache entries: ${error.message}`);
+        return [];
+      }
+    });
+
+    // Handle getCacheEntry function
+    this.on("getEntry", async (req) => {
+      const { key } = req.data;
+      const cacheService = await this._connectToCache(req);
+      const value = await cacheService.get(key);
+      return {
+        value: value,
+      };
+    });
+
+    // Handle setCacheEntry action
+    this.on("setEntry", async (req) => {
+      const { key, value, ttl } = req.data;
+      const cacheService = await this._connectToCache(req);
+
+      const size = Buffer.byteLength(String(value ?? ""), "utf8");
+      if (size > MAX_ENTRY_VALUE_BYTES) {
+        return req.reject(
+          400,
+          `Value exceeds the maximum of ${MAX_ENTRY_VALUE_BYTES} bytes (got ${size})`,
         );
+      }
+
+      await cacheService.set(key, value, { ttl: ttl });
+      req.info(`Cache entry set successfully: ${key}`);
+      return true;
+    });
+
+    // Handle deleteCacheEntry action
+    this.on("deleteEntry", async (req) => {
+      const { key } = req.data;
+      const cacheService = await this._connectToCache(req);
+      await cacheService.delete(key);
+      req.info(`Cache entry deleted successfully: ${key}`);
+      return true;
+    });
+
+    // Handle clearCache action
+    this.on("clear", async (req) => {
+      const cacheService = await this._connectToCache(req);
+      const cache = this._cacheName(req);
+      await cacheService.clear();
+      req.info(`Cache cleared successfully: ${cache}`);
+      return true;
+    });
+
+    // Handle clearKeyMetrics action
+    this.on("clearKeyMetrics", async (req) => {
+      const cacheService = await this._connectToCache(req);
+      const cache = this._cacheName(req);
+      await cacheService.clearKeyMetrics();
+      req.info(`Key metrics cleared successfully: ${cache}`);
+      return true;
+    });
+
+    // Handle clearTagMetrics action
+    this.on("clearTagMetrics", async (req) => {
+      const cacheService = await this._connectToCache(req);
+      const cache = this._cacheName(req);
+      await cacheService.clearTagMetrics();
+      req.info(`Tag metrics cleared successfully: ${cache}`);
+      return true;
+    });
+
+    // Handle clearMetrics action
+    this.on("clearMetrics", async (req) => {
+      const cacheService = await this._connectToCache(req);
+      const cache = this._cacheName(req);
+      await cacheService.clearMetrics();
+      req.info(`Metrics cleared successfully: ${cache}`);
+      return true;
+    });
+
+    await super.init();
+  }
+
+  /**
+   * Names of all configured cds-caching services. Used as an allow-list so a
+   * caller cannot coerce `cds.connect.to()` into connecting to an unrelated
+   * business service by passing its name as the cache key.
+   * @returns {Set<string>}
+   */
+  _allowedCaches() {
+    return new Set(
+      Object.entries(cds.env.requires || {})
+        .filter(([, config]) => config?.impl === "cds-caching")
+        .map(([name]) => name),
+    );
+  }
+
+  /**
+   * Name of the cache addressed by the request key.
+   * @param {object} req - Inbound request carrying the Caches key
+   * @returns {string|undefined}
+   */
+  _cacheName(req) {
+    const param = req.params?.[0];
+    return typeof param === "string" ? param : param?.name;
+  }
+
+  /**
+   * Resolve the cache addressed by the request key and connect to it.
+   * Rejects with 404 for anything that is not a configured cache.
+   * @param {object} req - Inbound request carrying the Caches key
+   * @returns {Promise<object>} The connected CachingService
+   */
+  async _connectToCache(req) {
+    const name = this._cacheName(req);
+
+    if (!name || !this._allowedCaches().has(name)) {
+      return req.reject(404, `Unknown cache: ${name}`);
     }
 
-    /**
-     * Name of the cache addressed by the request key.
-     * @param {object} req - Inbound request carrying the Caches key
-     * @returns {string|undefined}
-     */
-    _cacheName(req) {
-        const param = req.params?.[0];
-        return typeof param === 'string' ? param : param?.name;
+    if (isMultitenantMode()) {
+      await this._ensureCacheEntries();
     }
 
-    /**
-     * Resolve the cache addressed by the request key and connect to it.
-     * Rejects with 404 for anything that is not a configured cache.
-     * @param {object} req - Inbound request carrying the Caches key
-     * @returns {Promise<object>} The connected CachingService
-     */
-    async _connectToCache(req) {
-        const name = this._cacheName(req);
+    return cds.connect.to(name);
+  }
 
-        if (!name || !this._allowedCaches().has(name)) {
-            return req.reject(404, `Unknown cache: ${name}`);
+  /**
+   * Ensure cache entries exist in the current tenant's DB.
+   * Called lazily in MTX mode on first dashboard access.
+   */
+  async _ensureCacheEntries() {
+    const tenant = cds.context?.tenant ?? DEFAULT_TENANT;
+    if (!this._cacheEntriesInitialized) this._cacheEntriesInitialized = new Set();
+    if (this._cacheEntriesInitialized.has(tenant) || !isPluginModelAvailable()) return;
+
+    try {
+      const { Caches } = cds.entities("plugin.cds_caching");
+      const requires = cds.env.requires || {};
+
+      for (const [name, config] of Object.entries(requires)) {
+        if (config.impl === "cds-caching") {
+          const existing = await SELECT.one.from(Caches).where({ name });
+          if (!existing) {
+            await INSERT.into(Caches).entries({
+              name,
+              config: JSON.stringify({
+                impl: config.impl,
+                store: config.store || "memory",
+                namespace: config.namespace || name,
+              }),
+            });
+            this.log.info(`Created cache entry for: ${name} (lazy init)`);
+          }
         }
+      }
 
-        if (isMultitenantMode()) {
-            await this._ensureCacheEntries();
-        }
-
-        return cds.connect.to(name);
+      this._cacheEntriesInitialized.add(tenant);
+    } catch (error) {
+      this.log.warn("Failed to lazily initialize cache entries:", error);
     }
-
-    /**
-     * Ensure cache entries exist in the current tenant's DB.
-     * Called lazily in MTX mode on first dashboard access.
-     */
-    async _ensureCacheEntries() {
-        const tenant = cds.context?.tenant ?? DEFAULT_TENANT;
-        if (!this._cacheEntriesInitialized) this._cacheEntriesInitialized = new Set();
-        if (this._cacheEntriesInitialized.has(tenant) || !isPluginModelAvailable()) return;
-
-        try {
-            const { Caches } = cds.entities('plugin.cds_caching');
-            const requires = cds.env.requires || {};
-
-            for (const [name, config] of Object.entries(requires)) {
-                if (config.impl === 'cds-caching') {
-                    const existing = await SELECT.one.from(Caches).where({ name });
-                    if (!existing) {
-                        await INSERT.into(Caches).entries({
-                            name,
-                            config: JSON.stringify({
-                                impl: config.impl,
-                                store: config.store || 'memory',
-                                namespace: config.namespace || name
-                            })
-                        });
-                        this.log.info(`Created cache entry for: ${name} (lazy init)`);
-                    }
-                }
-            }
-
-            this._cacheEntriesInitialized.add(tenant);
-        } catch (error) {
-            this.log.warn('Failed to lazily initialize cache entries:', error);
-        }
-    }
+  }
 }
 
-module.exports = CachingApiService
+module.exports = CachingApiService;

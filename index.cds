@@ -1,5 +1,12 @@
 using from './db/statistics';
 
+type plugin.cds_caching.CacheEntry {
+    entryKey  : String;
+    value     : String;
+    timestamp : DateTime;
+    tags      : array of String;
+}
+
 context plugin.cds_caching {
 
     /**
@@ -21,18 +28,8 @@ context plugin.cds_caching {
         entity Caches     as projection on plugin.cds_caching.Caches
             actions {
 
-                function getEntries(top: Integer, skip: Integer)            returns array of {
-                    entryKey  : String;
-                    value     : String;
-                    timestamp : DateTime;
-                    tags      : array of String;
-                };
-
-                function getEntry(key: String)                              returns {
-                    value     : String;
-                    timestamp : DateTime;
-                    tags      : array of String;
-                };
+                function getEntries(top: Integer, skip: Integer) returns array of plugin.cds_caching.CacheEntry;
+                function getEntry(key: String)                   returns plugin.cds_caching.CacheEntry;
 
                 action   setEntry(key: String, value: String, ttl: Integer) returns Boolean;
                 action   deleteEntry(key: String)                           returns Boolean;
@@ -53,12 +50,12 @@ context plugin.cds_caching {
                     $Type         : 'Common.SideEffectsType',
                     TargetEntities: [in]
                 }
-                action   setMetricsEnabled(enabled: Boolean)                returns Boolean;
+                action   toggleMetrics(enabled: Boolean)                    returns Boolean;
                 @Common.SideEffects: {
                     $Type         : 'Common.SideEffectsType',
                     TargetEntities: [in]
                 }
-                action   setKeyMetricsEnabled(enabled: Boolean)             returns Boolean;
+                action   toggleKeyMetrics(enabled: Boolean)                 returns Boolean;
             };
 
         @readonly
@@ -91,11 +88,11 @@ annotate plugin.cds_caching.CachingApiService.Caches with @(
     UI.Identification: [
         {
             $Type : 'UI.DataFieldForAction',
-            Action: 'plugin.cds_caching.CachingApiService.setMetricsEnabled',
+            Action: 'plugin.cds_caching.CachingApiService.toggleMetrics',
         },
         {
             $Type : 'UI.DataFieldForAction',
-            Action: 'plugin.cds_caching.CachingApiService.setKeyMetricsEnabled',
+            Action: 'plugin.cds_caching.CachingApiService.toggleKeyMetrics',
         },
     ],
     UI.Facets        : [{
@@ -170,3 +167,8 @@ annotate plugin.cds_caching.CachingApiService.Metrics with @(UI.LineItem: [
         Value: timestamp,
     },
 ]);
+
+extend projection plugin.cds_caching.CachingApiService.Caches with {
+    case when metricsEnabled    = true then 3 else 1 end as metricsStatus    : Integer,
+    case when keyMetricsEnabled = true then 3 else 1 end as keyMetricsStatus : Integer
+}
