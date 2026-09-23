@@ -1,0 +1,42 @@
+<core:FragmentDefinition
+    xmlns:core="sap.ui.core"
+    xmlns="sap.m"
+    xmlns:l="sap.ui.layout"
+    core:require="{handler: 'cds/plugin/caching/dashboardfe/ext/ObjectPageExtension'}">
+
+    <l:VerticalLayout width="100%">
+        <MessageStrip
+            text="{i18n>warningEntries}"
+            type="Warning"
+            showIcon="true"
+            class="sapUiSmallMarginBottom" />
+        <Button
+            text="{i18n>btnLoadEntries}"
+            icon="sap-icon://download"
+            type="Emphasized"
+            press="handler.onLoadCacheEntries"
+            class="sapUiSmallMarginBottom" />
+        <Table
+            id="entriesTable"
+            items="{path: 'entriesModel>/entries'}"
+            visible="{= ${entriesModel>/entries/length} > 0 }">
+            <columns>
+                <Column><Text text="{i18n>colKey}" /></Column>
+                <Column><Text text="{i18n>colValue}" /></Column>
+                <Column><Text text="{i18n>colTags}" /></Column>
+                <Column><Text text="{i18n>colTimestamp}" /></Column>
+            </columns>
+            <items>
+                <ColumnListItem>
+                    <cells>
+                        <Text text="{entriesModel>entryKey}" tooltip="{entriesModel>entryKey}" />
+                        <Text text="{entriesModel>value}" tooltip="{entriesModel>value}" />
+                        <Text text="{entriesModel>tags}" />
+                        <Text text="{entriesModel>timestamp}" />
+                    </cells>
+                </ColumnListItem>
+            </items>
+        </Table>
+    </l:VerticalLayout>
+
+</core:FragmentDefinition>

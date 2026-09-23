@@ -1,0 +1,96 @@
+<core:FragmentDefinition
+    xmlns:core="sap.ui.core"
+    xmlns="sap.m"
+    xmlns:f="sap.f"
+    xmlns:card="sap.f.cards"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:l="sap.ui.layout"
+    core:require="{handler: 'cds/plugin/caching/dashboardfe/ext/ObjectPageExtension'}">
+
+    <f:GridContainer snapToRow="true" allowDenseFill="true">
+
+        <!-- Configuration Card -->
+        <f:Card>
+            <f:header>
+                <card:Header title="{i18n>labelConfig}" subtitle="{i18n>labelConfigSubtitle}" />
+            </f:header>
+            <f:content>
+                <TextArea value="{config}" editable="false" rows="10" width="100%" />
+            </f:content>
+            <f:layoutData>
+                <f:GridContainerItemLayoutData columns="6" minRows="3" />
+            </f:layoutData>
+        </f:Card>
+
+        <!-- Create Entry Card -->
+        <f:Card>
+            <f:header>
+                <card:Header title="{i18n>labelCreateEntry}" />
+            </f:header>
+            <f:content>
+                <l:VerticalLayout width="100%">
+                    <form:SimpleForm editable="true" layout="ResponsiveGridLayout" labelSpanL="3" labelSpanM="3">
+                        <form:content>
+                            <Label text="{i18n>labelKey}" />
+                            <Input id="createKey" />
+                            <Label text="{i18n>labelValue}" />
+                            <TextArea id="createValue" rows="4" width="100%" />
+                            <Label text="{i18n>labelTtl}" />
+                            <Input id="createTtl" type="Number" />
+                        </form:content>
+                    </form:SimpleForm>
+                    <Button text="{i18n>btnSetEntry}" type="Emphasized" press="handler.onSetEntry" />
+                </l:VerticalLayout>
+            </f:content>
+            <f:layoutData>
+                <f:GridContainerItemLayoutData columns="6" minRows="3" />
+            </f:layoutData>
+        </f:Card>
+
+        <!-- Get Entry Card -->
+        <f:Card>
+            <f:header>
+                <card:Header title="{i18n>labelGetEntry}" />
+            </f:header>
+            <f:content>
+                <l:VerticalLayout width="100%">
+                    <form:SimpleForm editable="true" layout="ResponsiveGridLayout" labelSpanL="3" labelSpanM="3">
+                        <form:content>
+                            <Label text="{i18n>labelKey}" />
+                            <Input id="getKey" />
+                            <Label text="{i18n>labelResult}" />
+                            <TextArea id="getResult" rows="4" editable="false" width="100%" />
+                        </form:content>
+                    </form:SimpleForm>
+                    <Button text="{i18n>btnGetEntry}" type="Emphasized" press="handler.onGetEntry" />
+                </l:VerticalLayout>
+            </f:content>
+            <f:layoutData>
+                <f:GridContainerItemLayoutData columns="6" minRows="3" />
+            </f:layoutData>
+        </f:Card>
+
+        <!-- Delete Entry Card -->
+        <f:Card>
+            <f:header>
+                <card:Header title="{i18n>labelDeleteEntry}" />
+            </f:header>
+            <f:content>
+                <l:VerticalLayout width="100%">
+                    <form:SimpleForm editable="true" layout="ResponsiveGridLayout" labelSpanL="3" labelSpanM="3">
+                        <form:content>
+                            <Label text="{i18n>labelKey}" />
+                            <Input id="deleteKey" />
+                        </form:content>
+                    </form:SimpleForm>
+                    <Button text="{i18n>btnDeleteEntry}" type="Emphasized" press="handler.onDeleteEntry" />
+                </l:VerticalLayout>
+            </f:content>
+            <f:layoutData>
+                <f:GridContainerItemLayoutData columns="6" minRows="3" />
+            </f:layoutData>
+        </f:Card>
+
+    </f:GridContainer>
+
+</core:FragmentDefinition>
