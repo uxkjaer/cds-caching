@@ -1,8 +1,7 @@
 <core:FragmentDefinition
     xmlns:core="sap.ui.core"
     xmlns="sap.m"
-    xmlns:l="sap.ui.layout"
-    core:require="{handler: 'cds/plugin/caching/dashboardfe/ext/ObjectPageExtension'}">
+    xmlns:l="sap.ui.layout">
 
     <l:VerticalLayout width="100%">
         <MessageStrip
@@ -14,12 +13,13 @@
             text="{i18n>btnLoadEntries}"
             icon="sap-icon://download"
             type="Emphasized"
-            press="handler.onLoadCacheEntries"
+            press=".extension.cds.plugin.caching.dashboardfe.ext.ObjectPageExtension.onLoadCacheEntries"
             class="sapUiSmallMarginBottom" />
         <Table
             id="entriesTable"
-            items="{path: 'entriesModel>/entries'}"
-            visible="{= ${entriesModel>/entries/length} > 0 }">
+            items="{entriesModel>/entries}"
+            visible="{= ${entriesModel>/entries/length} > 0 }"
+            noDataText="No cache entries found">
             <columns>
                 <Column><Text text="{i18n>colKey}" /></Column>
                 <Column><Text text="{i18n>colValue}" /></Column>
@@ -29,8 +29,8 @@
             <items>
                 <ColumnListItem>
                     <cells>
-                        <Text text="{entriesModel>entryKey}" tooltip="{entriesModel>entryKey}" />
-                        <Text text="{entriesModel>value}" tooltip="{entriesModel>value}" />
+                        <Text text="{entriesModel>entryKey}" />
+                        <Text text="{entriesModel>value}" />
                         <Text text="{entriesModel>tags}" />
                         <Text text="{entriesModel>timestamp}" />
                     </cells>

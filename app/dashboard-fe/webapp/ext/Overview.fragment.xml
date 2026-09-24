@@ -4,8 +4,7 @@
     xmlns:f="sap.f"
     xmlns:card="sap.f.cards"
     xmlns:form="sap.ui.layout.form"
-    xmlns:l="sap.ui.layout"
-    core:require="{handler: 'cds/plugin/caching/dashboardfe/ext/ObjectPageExtension'}">
+    xmlns:l="sap.ui.layout">
 
     <f:GridContainer snapToRow="true" allowDenseFill="true">
 
@@ -39,7 +38,7 @@
                             <Input id="createTtl" type="Number" />
                         </form:content>
                     </form:SimpleForm>
-                    <Button text="{i18n>btnSetEntry}" type="Emphasized" press="handler.onSetEntry" />
+                    <Button text="{i18n>btnSetEntry}" type="Emphasized" press=".extension.cds.plugin.caching.dashboardfe.ext.ObjectPageExtension.onSetEntry" />
                 </l:VerticalLayout>
             </f:content>
             <f:layoutData>
@@ -62,7 +61,7 @@
                             <TextArea id="getResult" rows="4" editable="false" width="100%" />
                         </form:content>
                     </form:SimpleForm>
-                    <Button text="{i18n>btnGetEntry}" type="Emphasized" press="handler.onGetEntry" />
+                    <Button text="{i18n>btnGetEntry}" type="Emphasized" press=".extension.cds.plugin.caching.dashboardfe.ext.ObjectPageExtension.onGetEntry" />
                 </l:VerticalLayout>
             </f:content>
             <f:layoutData>
@@ -83,7 +82,7 @@
                             <Input id="deleteKey" />
                         </form:content>
                     </form:SimpleForm>
-                    <Button text="{i18n>btnDeleteEntry}" type="Emphasized" press="handler.onDeleteEntry" />
+                    <Button text="{i18n>btnDeleteEntry}" type="Emphasized" press=".extension.cds.plugin.caching.dashboardfe.ext.ObjectPageExtension.onDeleteEntry" />
                 </l:VerticalLayout>
             </f:content>
             <f:layoutData>
