@@ -5,9 +5,9 @@ annotate S.Caches with @(
     Common.SemanticKey: [name],
     UI.SelectionFields: [name, metricsEnabled, keyMetricsEnabled],
     UI.LineItem: [
-        { $Type: 'UI.DataField', Value: name,              Label: 'Name' },
-        { $Type: 'UI.DataField', Value: metricsEnabled,    Label: 'Metrics Enabled' },
-        { $Type: 'UI.DataField', Value: keyMetricsEnabled, Label: 'Key Metrics Enabled' }
+        { $Type: 'UI.DataField', Value: name },
+        { $Type: 'UI.DataField', Value: metricsEnabled },
+        { $Type: 'UI.DataField', Value: keyMetricsEnabled }
     ]
 );
 
@@ -61,32 +61,32 @@ annotate S.Metrics with @(
         Title         : { Value: timestamp }
     },
     UI.LineItem: [
-        { $Type: 'UI.DataField', Value: timestamp,             Label: 'Timestamp' },
-        { $Type: 'UI.DataField', Value: period,                Label: 'Period' },
-        { $Type: 'UI.DataField', Value: hits,                  Label: 'Hits' },
-        { $Type: 'UI.DataField', Value: misses,                Label: 'Misses' },
-        { $Type: 'UI.DataField', Value: errors,                Label: 'Errors' },
-        { $Type: 'UI.DataField', Value: totalRequests,         Label: 'Total Requests' },
-        { $Type: 'UI.DataField', Value: hitRatio,              Label: 'Hit Ratio %' },
-        { $Type: 'UI.DataField', Value: throughput,            Label: 'Throughput' },
-        { $Type: 'UI.DataField', Value: errorRate,             Label: 'Error Rate %' },
-        { $Type: 'UI.DataField', Value: cacheEfficiency,       Label: 'Cache Efficiency' },
-        { $Type: 'UI.DataField', Value: avgReadThroughLatency, Label: 'Avg RT Latency (ms)' },
-        { $Type: 'UI.DataField', Value: avgHitLatency,         Label: 'Avg Hit (ms)' },
-        { $Type: 'UI.DataField', Value: minHitLatency,         Label: 'Min Hit (ms)' },
-        { $Type: 'UI.DataField', Value: maxHitLatency,         Label: 'Max Hit (ms)' },
-        { $Type: 'UI.DataField', Value: avgMissLatency,        Label: 'Avg Miss (ms)' },
-        { $Type: 'UI.DataField', Value: minMissLatency,        Label: 'Min Miss (ms)' },
-        { $Type: 'UI.DataField', Value: maxMissLatency,        Label: 'Max Miss (ms)' },
-        { $Type: 'UI.DataField', Value: nativeSets,            Label: 'Sets' },
-        { $Type: 'UI.DataField', Value: nativeGets,            Label: 'Gets' },
-        { $Type: 'UI.DataField', Value: nativeDeletes,         Label: 'Deletes' },
-        { $Type: 'UI.DataField', Value: nativeClears,          Label: 'Clears' },
-        { $Type: 'UI.DataField', Value: nativeDeleteByTags,    Label: 'Delete By Tags' },
-        { $Type: 'UI.DataField', Value: nativeErrors,          Label: 'Native Errors' },
-        { $Type: 'UI.DataField', Value: totalNativeOperations, Label: 'Total Native Ops' },
-        { $Type: 'UI.DataField', Value: nativeThroughput,      Label: 'Native Throughput' },
-        { $Type: 'UI.DataField', Value: nativeErrorRate,       Label: 'Native Error Rate %' }
+        { $Type: 'UI.DataField', Value: timestamp },
+        { $Type: 'UI.DataField', Value: period },
+        { $Type: 'UI.DataField', Value: hits },
+        { $Type: 'UI.DataField', Value: misses },
+        { $Type: 'UI.DataField', Value: errors },
+        { $Type: 'UI.DataField', Value: totalRequests },
+        { $Type: 'UI.DataField', Value: hitRatio },
+        { $Type: 'UI.DataField', Value: throughput },
+        { $Type: 'UI.DataField', Value: errorRate },
+        { $Type: 'UI.DataField', Value: cacheEfficiency },
+        { $Type: 'UI.DataField', Value: avgReadThroughLatency },
+        { $Type: 'UI.DataField', Value: avgHitLatency },
+        { $Type: 'UI.DataField', Value: minHitLatency },
+        { $Type: 'UI.DataField', Value: maxHitLatency },
+        { $Type: 'UI.DataField', Value: avgMissLatency },
+        { $Type: 'UI.DataField', Value: minMissLatency },
+        { $Type: 'UI.DataField', Value: maxMissLatency },
+        { $Type: 'UI.DataField', Value: nativeSets },
+        { $Type: 'UI.DataField', Value: nativeGets },
+        { $Type: 'UI.DataField', Value: nativeDeletes },
+        { $Type: 'UI.DataField', Value: nativeClears },
+        { $Type: 'UI.DataField', Value: nativeDeleteByTags },
+        { $Type: 'UI.DataField', Value: nativeErrors },
+        { $Type: 'UI.DataField', Value: totalNativeOperations },
+        { $Type: 'UI.DataField', Value: nativeThroughput },
+        { $Type: 'UI.DataField', Value: nativeErrorRate }
     ]
 );
 
@@ -99,31 +99,31 @@ annotate S.KeyMetrics with @(
         Title         : { Value: keyName }
     },
     UI.LineItem: [
-        { $Type: 'UI.DataField', Value: keyName,          Label: 'Key Name' },
-        { $Type: 'UI.DataField', Value: operation,        Label: 'Operation' },
-        { $Type: 'UI.DataField', Value: dataType,         Label: 'Type' },
-        { $Type: 'UI.DataField', Value: operationType,    Label: 'Operation Type' },
-        { $Type: 'UI.DataField', Value: target,           Label: 'Target' },
-        { $Type: 'UI.DataField', Value: hits,             Label: 'Hits' },
-        { $Type: 'UI.DataField', Value: misses,           Label: 'Misses' },
-        { $Type: 'UI.DataField', Value: totalRequests,    Label: 'Total' },
-        { $Type: 'UI.DataField', Value: hitRatio,         Label: 'Hit Ratio %' },
-        { $Type: 'UI.DataField', Value: cacheEfficiency,  Label: 'Cache Efficiency' },
-        { $Type: 'UI.DataField', Value: avgHitLatency,    Label: 'Avg Hit (ms)' },
-        { $Type: 'UI.DataField', Value: minHitLatency,    Label: 'Min Hit (ms)' },
-        { $Type: 'UI.DataField', Value: maxHitLatency,    Label: 'Max Hit (ms)' },
-        { $Type: 'UI.DataField', Value: avgMissLatency,   Label: 'Avg Miss (ms)' },
-        { $Type: 'UI.DataField', Value: minMissLatency,   Label: 'Min Miss (ms)' },
-        { $Type: 'UI.DataField', Value: maxMissLatency,   Label: 'Max Miss (ms)' },
-        { $Type: 'UI.DataField', Value: nativeHits,       Label: 'Native Hits' },
-        { $Type: 'UI.DataField', Value: nativeMisses,     Label: 'Native Misses' },
-        { $Type: 'UI.DataField', Value: nativeSets,       Label: 'Native Sets' },
-        { $Type: 'UI.DataField', Value: nativeDeletes,    Label: 'Native Deletes' },
-        { $Type: 'UI.DataField', Value: tenant,           Label: 'Tenant' },
-        { $Type: 'UI.DataField', Value: user,             Label: 'User' },
-        { $Type: 'UI.DataField', Value: locale,           Label: 'Locale' },
-        { $Type: 'UI.DataField', Value: lastAccess,       Label: 'Last Access' },
-        { $Type: 'UI.DataField', Value: timestamp,        Label: 'First Access' }
+        { $Type: 'UI.DataField', Value: keyName },
+        { $Type: 'UI.DataField', Value: operation },
+        { $Type: 'UI.DataField', Value: dataType },
+        { $Type: 'UI.DataField', Value: operationType },
+        { $Type: 'UI.DataField', Value: target },
+        { $Type: 'UI.DataField', Value: hits },
+        { $Type: 'UI.DataField', Value: misses },
+        { $Type: 'UI.DataField', Value: totalRequests },
+        { $Type: 'UI.DataField', Value: hitRatio },
+        { $Type: 'UI.DataField', Value: cacheEfficiency },
+        { $Type: 'UI.DataField', Value: avgHitLatency },
+        { $Type: 'UI.DataField', Value: minHitLatency },
+        { $Type: 'UI.DataField', Value: maxHitLatency },
+        { $Type: 'UI.DataField', Value: avgMissLatency },
+        { $Type: 'UI.DataField', Value: minMissLatency },
+        { $Type: 'UI.DataField', Value: maxMissLatency },
+        { $Type: 'UI.DataField', Value: nativeHits },
+        { $Type: 'UI.DataField', Value: nativeMisses },
+        { $Type: 'UI.DataField', Value: nativeSets },
+        { $Type: 'UI.DataField', Value: nativeDeletes },
+        { $Type: 'UI.DataField', Value: tenant },
+        { $Type: 'UI.DataField', Value: user },
+        { $Type: 'UI.DataField', Value: locale },
+        { $Type: 'UI.DataField', Value: lastAccess },
+        { $Type: 'UI.DataField', Value: timestamp }
     ]
 );
 
@@ -315,8 +315,8 @@ annotate S.Metrics with @(
 
     // ── Header Facets (compact: 2 charts + 4 key KPI numbers) ──
     UI.HeaderFacets: [
-        { $Type: 'UI.ReferenceFacet', ID: 'HitRatioChart',     Target: '@UI.Chart#hitRatioChart',        Label: 'Hit Ratio' },
-        { $Type: 'UI.ReferenceFacet', ID: 'ErrorRateChart',    Target: '@UI.Chart#errorRateChart',       Label: 'Error Rate' },
+        { $Type: 'UI.ReferenceFacet', ID: 'HitRatioChart',     Target: '@UI.Chart#hitRatioChart' },
+        { $Type: 'UI.ReferenceFacet', ID: 'ErrorRateChart',    Target: '@UI.Chart#errorRateChart' },
         { $Type: 'UI.ReferenceFacet', ID: 'CacheEfficiency',   Target: '@UI.DataPoint#cacheEfficiencyKPI' },
         { $Type: 'UI.ReferenceFacet', ID: 'Throughput',        Target: '@UI.DataPoint#throughputKPI' },
         { $Type: 'UI.ReferenceFacet', ID: 'Hits',              Target: '@UI.DataPoint#hitsKPI' },
@@ -329,36 +329,36 @@ annotate S.Metrics with @(
     UI.FieldGroup #ReadThrough: {
         Label: 'Read-Through Details',
         Data: [
-            { $Type: 'UI.DataField', Value: hits,                  Label: 'Hits' },
-            { $Type: 'UI.DataField', Value: misses,                Label: 'Misses' },
-            { $Type: 'UI.DataField', Value: errors,                Label: 'Errors' },
-            { $Type: 'UI.DataField', Value: totalRequests,         Label: 'Total Requests' },
-            { $Type: 'UI.DataField', Value: hitRatio,              Label: 'Hit Ratio %' },
-            { $Type: 'UI.DataField', Value: throughput,            Label: 'Throughput (req/s)' },
-            { $Type: 'UI.DataField', Value: errorRate,             Label: 'Error Rate %' },
-            { $Type: 'UI.DataField', Value: cacheEfficiency,       Label: 'Cache Efficiency (x)' },
-            { $Type: 'UI.DataField', Value: avgReadThroughLatency, Label: 'Avg RT Latency (ms)' },
-            { $Type: 'UI.DataField', Value: avgHitLatency,         Label: 'Avg Hit Latency (ms)' },
-            { $Type: 'UI.DataField', Value: minHitLatency,         Label: 'Min Hit Latency (ms)' },
-            { $Type: 'UI.DataField', Value: maxHitLatency,         Label: 'Max Hit Latency (ms)' },
-            { $Type: 'UI.DataField', Value: avgMissLatency,        Label: 'Avg Miss Latency (ms)' },
-            { $Type: 'UI.DataField', Value: minMissLatency,        Label: 'Min Miss Latency (ms)' },
-            { $Type: 'UI.DataField', Value: maxMissLatency,        Label: 'Max Miss Latency (ms)' }
+            { $Type: 'UI.DataField', Value: hits },
+            { $Type: 'UI.DataField', Value: misses },
+            { $Type: 'UI.DataField', Value: errors },
+            { $Type: 'UI.DataField', Value: totalRequests },
+            { $Type: 'UI.DataField', Value: hitRatio },
+            { $Type: 'UI.DataField', Value: throughput },
+            { $Type: 'UI.DataField', Value: errorRate },
+            { $Type: 'UI.DataField', Value: cacheEfficiency },
+            { $Type: 'UI.DataField', Value: avgReadThroughLatency },
+            { $Type: 'UI.DataField', Value: avgHitLatency },
+            { $Type: 'UI.DataField', Value: minHitLatency },
+            { $Type: 'UI.DataField', Value: maxHitLatency },
+            { $Type: 'UI.DataField', Value: avgMissLatency },
+            { $Type: 'UI.DataField', Value: minMissLatency },
+            { $Type: 'UI.DataField', Value: maxMissLatency }
         ]
     },
 
     UI.FieldGroup #NativeOps: {
         Label: 'Native Function Details',
         Data: [
-            { $Type: 'UI.DataField', Value: nativeSets,           Label: 'Sets' },
-            { $Type: 'UI.DataField', Value: nativeGets,           Label: 'Gets' },
-            { $Type: 'UI.DataField', Value: nativeDeletes,        Label: 'Deletes' },
-            { $Type: 'UI.DataField', Value: nativeClears,         Label: 'Clears' },
-            { $Type: 'UI.DataField', Value: nativeDeleteByTags,   Label: 'Delete By Tags' },
-            { $Type: 'UI.DataField', Value: nativeErrors,         Label: 'Native Errors' },
-            { $Type: 'UI.DataField', Value: totalNativeOperations,Label: 'Total Native Ops' },
-            { $Type: 'UI.DataField', Value: nativeThroughput,     Label: 'Native Throughput (ops/s)' },
-            { $Type: 'UI.DataField', Value: nativeErrorRate,      Label: 'Native Error Rate %' }
+            { $Type: 'UI.DataField', Value: nativeSets },
+            { $Type: 'UI.DataField', Value: nativeGets },
+            { $Type: 'UI.DataField', Value: nativeDeletes },
+            { $Type: 'UI.DataField', Value: nativeClears },
+            { $Type: 'UI.DataField', Value: nativeDeleteByTags },
+            { $Type: 'UI.DataField', Value: nativeErrors },
+            { $Type: 'UI.DataField', Value: totalNativeOperations },
+            { $Type: 'UI.DataField', Value: nativeThroughput },
+            { $Type: 'UI.DataField', Value: nativeErrorRate }
         ]
     }
 );

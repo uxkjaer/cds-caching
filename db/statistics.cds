@@ -1,11 +1,11 @@
 namespace plugin.cds_caching;
 
 entity Caches {
-    key name              : String;
-        config            : String;
-        metricsEnabled    : Boolean default false;
-        keyMetricsEnabled : Boolean default false;
-        tagMetricsEnabled : Boolean default false;
+    key name              : String         @title: 'Name';
+        config            : String         @title: 'Configuration';
+        metricsEnabled    : Boolean default false @title: 'Metrics Enabled';
+        keyMetricsEnabled : Boolean default false @title: 'Key Metrics Enabled';
+        tagMetricsEnabled : Boolean default false @title: 'Tag Metrics Enabled';
         metrics           : Composition of many Metrics
                                 on metrics.cache = $self.name;
         keyMetrics        : Composition of many KeyMetrics
@@ -16,50 +16,49 @@ entity Caches {
 
 entity Metrics {
     key ID                    : String; // e.g., 'daily:2024-03-20' or 'hourly:2024-03-20-15'
-    key cache                 : String;
-        timestamp             : DateTime;
-        period                : String enum {
+    key cache                 : String @title: 'Cache';
+        timestamp             : DateTime @title: 'Timestamp';
+        period                : String @title: 'Period' enum {
             hourly;
             daily;
             monthly;
-        }; // Granularity
+        };
 
-        // Read-through metrics (hits and misses only)
-        hits                  : Integer default 0;
-        misses                : Integer default 0;
-        errors                : Integer default 0;
-        totalRequests         : Integer default 0;
-        // Read-through latency metrics
-        avgHitLatency         : Double; // average hit latency in milliseconds
-        minHitLatency         : Double; // minimum hit latency
-        maxHitLatency         : Double; // maximum hit latency
-        avgMissLatency        : Double; // average miss latency in milliseconds
-        minMissLatency        : Double; // minimum miss latency
-        maxMissLatency        : Double; // maximum miss latency
-        avgReadThroughLatency : Double; // average read through latency in milliseconds
+        // Read-through metrics
+        hits                  : Integer default 0    @title: 'Hits';
+        misses                : Integer default 0    @title: 'Misses';
+        errors                : Integer default 0    @title: 'Errors';
+        totalRequests         : Integer default 0    @title: 'Total Requests';
+        // Read-through latency
+        avgHitLatency         : Decimal(15,2) @title: 'Avg Hit Latency (ms)';
+        minHitLatency         : Decimal(15,2) @title: 'Min Hit Latency (ms)';
+        maxHitLatency         : Decimal(15,2) @title: 'Max Hit Latency (ms)';
+        avgMissLatency        : Decimal(15,2) @title: 'Avg Miss Latency (ms)';
+        minMissLatency        : Decimal(15,2) @title: 'Min Miss Latency (ms)';
+        maxMissLatency        : Decimal(15,2) @title: 'Max Miss Latency (ms)';
+        avgReadThroughLatency : Decimal(15,2) @title: 'Avg RT Latency (ms)';
 
-        // Read-through performance metrics
-        hitRatio              : Double; // hit ratio as percentage
-        throughput            : Double; // requests per second
-        errorRate             : Double; // error rate as percentage
-        cacheEfficiency       : Double; // ratio of miss latency to hit latency
+        // Read-through performance
+        hitRatio              : Decimal(15,2) @title: 'Hit Ratio %';
+        throughput            : Decimal(15,2) @title: 'Throughput (req/s)';
+        errorRate             : Decimal(15,2) @title: 'Error Rate %';
+        cacheEfficiency       : Decimal(15,2) @title: 'Cache Efficiency (x)';
 
-        // Native function metrics (basic counts only)
-        nativeSets            : Integer default 0;
-        nativeGets            : Integer default 0;
-        nativeDeletes         : Integer default 0;
-        nativeClears          : Integer default 0;
-        nativeDeleteByTags    : Integer default 0;
-        nativeErrors          : Integer default 0;
-        totalNativeOperations : Integer default 0;
-        // Native function performance metrics
-        nativeThroughput      : Double; // native operations per second
-        nativeErrorRate       : Double; // native operation error rate
+        // Native function metrics
+        nativeSets            : Integer default 0    @title: 'Sets';
+        nativeGets            : Integer default 0    @title: 'Gets';
+        nativeDeletes         : Integer default 0    @title: 'Deletes';
+        nativeClears          : Integer default 0    @title: 'Clears';
+        nativeDeleteByTags    : Integer default 0    @title: 'Delete By Tags';
+        nativeErrors          : Integer default 0    @title: 'Native Errors';
+        totalNativeOperations : Integer default 0    @title: 'Total Native Ops';
+        nativeThroughput      : Decimal(15,2) @title: 'Native Throughput (ops/s)';
+        nativeErrorRate       : Decimal(15,2) @title: 'Native Error Rate %';
 
         // Common metrics
-        memoryUsage           : Integer; // in bytes
-        itemCount             : Integer;
-        uptimeMs              : Integer; // uptime in milliseconds
+        memoryUsage           : Integer @title: 'Memory Usage (bytes)';
+        itemCount             : Integer @title: 'Item Count';
+        uptimeMs              : Integer @title: 'Uptime (ms)';
 }
 
 entity KeyMetrics {
@@ -85,21 +84,21 @@ entity KeyMetrics {
         misses                : Integer default 0;
         errors                : Integer default 0;
         totalRequests         : Integer default 0;
-        hitRatio              : Double; // hit ratio as percentage
-        cacheEfficiency       : Double; // ratio of miss latency to hit latency
+        hitRatio              : Decimal(15,2); // hit ratio as percentage
+        cacheEfficiency       : Decimal(15,2); // ratio of miss latency to hit latency
 
         // Read-through latency metrics
-        avgHitLatency         : Double; // average hit latency in milliseconds
-        minHitLatency         : Double; // minimum hit latency
-        maxHitLatency         : Double; // maximum hit latency
-        avgMissLatency        : Double; // average miss latency in milliseconds
-        minMissLatency        : Double; // minimum miss latency
-        maxMissLatency        : Double; // maximum miss latency
-        avgReadThroughLatency : Double; // average read through latency in milliseconds
+        avgHitLatency         : Decimal(15,2); // average hit latency in milliseconds
+        minHitLatency         : Decimal(15,2); // minimum hit latency
+        maxHitLatency         : Decimal(15,2); // maximum hit latency
+        avgMissLatency        : Decimal(15,2); // average miss latency in milliseconds
+        minMissLatency        : Decimal(15,2); // minimum miss latency
+        maxMissLatency        : Decimal(15,2); // maximum miss latency
+        avgReadThroughLatency : Decimal(15,2); // average read through latency in milliseconds
 
         // Read-through performance metrics
-        throughput            : Double; // requests per second
-        errorRate             : Double; // error rate as percentage
+        throughput            : Decimal(15,2); // requests per second
+        errorRate             : Decimal(15,2); // error rate as percentage
 
         // Native function metrics (counts only)
         nativeHits            : Integer default 0;
@@ -111,8 +110,8 @@ entity KeyMetrics {
         nativeErrors          : Integer default 0;
         totalNativeOperations : Integer default 0;
         // Native function performance metrics
-        nativeThroughput      : Double; // native operations per second
-        nativeErrorRate       : Double; // native operation error rate
+        nativeThroughput      : Decimal(15,2); // native operations per second
+        nativeErrorRate       : Decimal(15,2); // native operation error rate
 
         // Metadata fields
         dataType              : String;
@@ -154,21 +153,21 @@ entity TagMetrics {
         misses                : Integer default 0;
         errors                : Integer default 0;
         totalRequests         : Integer default 0;
-        hitRatio              : Double;
-        cacheEfficiency       : Double;
+        hitRatio              : Decimal(15,2);
+        cacheEfficiency       : Decimal(15,2);
 
         // Read-through latency metrics
-        avgHitLatency         : Double;
-        minHitLatency         : Double;
-        maxHitLatency         : Double;
-        avgMissLatency        : Double;
-        minMissLatency        : Double;
-        maxMissLatency        : Double;
-        avgReadThroughLatency : Double;
+        avgHitLatency         : Decimal(15,2);
+        minHitLatency         : Decimal(15,2);
+        maxHitLatency         : Decimal(15,2);
+        avgMissLatency        : Decimal(15,2);
+        minMissLatency        : Decimal(15,2);
+        maxMissLatency        : Decimal(15,2);
+        avgReadThroughLatency : Decimal(15,2);
 
         // Read-through performance metrics
-        throughput            : Double;
-        errorRate             : Double;
+        throughput            : Decimal(15,2);
+        errorRate             : Decimal(15,2);
 
         // Native function metrics (counts only)
         nativeHits            : Integer default 0;
@@ -177,8 +176,8 @@ entity TagMetrics {
         nativeDeletes         : Integer default 0;
         nativeErrors          : Integer default 0;
         totalNativeOperations : Integer default 0;
-        nativeThroughput      : Double;
-        nativeErrorRate       : Double;
+        nativeThroughput      : Decimal(15,2);
+        nativeErrorRate       : Decimal(15,2);
 
         timestamp             : DateTime;
 }
