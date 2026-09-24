@@ -22,32 +22,36 @@ class CachingApiService extends cds.ApplicationService {
         await this._ensureCacheEntries();
       });
     }
-    // Handle toggleMetrics action
+    // Handle toggleMetrics action — reads current state from DB and flips it
     this.on("toggleMetrics", async (req) => {
-      const { enabled } = req.data;
-      const cacheService = await this._connectToCache(req);
       const cache = this._cacheName(req);
+      const cacheService = await this._connectToCache(req);
       try {
-        await cacheService.setMetricsEnabled(enabled);
-        req.info(`Metrics ${enabled ? "enabled" : "disabled"} for cache ${cache}`);
-        return true;
+        const { Caches } = this.entities;
+        const row = await SELECT.one(Caches, { name: cache });
+        const newEnabled = !row?.metricsEnabled;
+        await cacheService.setMetricsEnabled(newEnabled);
+        req.info(`Metrics ${newEnabled ? "enabled" : "disabled"} for cache ${cache}`);
+        return newEnabled;
       } catch (error) {
-        req.error(`Failed to set metrics enabled: ${error.message}`);
+        req.error(`Failed to toggle metrics: ${error.message}`);
         return false;
       }
     });
 
-    // Handle toggleKeyMetrics action
+    // Handle toggleKeyMetrics action — reads current state from DB and flips it
     this.on("toggleKeyMetrics", async (req) => {
-      const { enabled } = req.data;
-      const cacheService = await this._connectToCache(req);
       const cache = this._cacheName(req);
+      const cacheService = await this._connectToCache(req);
       try {
-        await cacheService.setKeyMetricsEnabled(enabled);
-        req.info(`Key metrics ${enabled ? "enabled" : "disabled"} for cache ${cache}`);
-        return true;
+        const { Caches } = this.entities;
+        const row = await SELECT.one(Caches, { name: cache });
+        const newEnabled = !row?.keyMetricsEnabled;
+        await cacheService.setKeyMetricsEnabled(newEnabled);
+        req.info(`Key metrics ${newEnabled ? "enabled" : "disabled"} for cache ${cache}`);
+        return newEnabled;
       } catch (error) {
-        req.error(`Failed to set key metrics enabled: ${error.message}`);
+        req.error(`Failed to toggle key metrics: ${error.message}`);
         return false;
       }
     });

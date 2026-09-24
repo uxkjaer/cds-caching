@@ -319,9 +319,9 @@ describeFromCds(9, 'Caching API Service', () => {
         describe('toggleMetrics', () => {
 
             it("should enable metrics", async () => {
-                const { data } = await POST('/odata/v4/caching-api/Caches(\'caching\')/toggleMetrics', {
-                    enabled: true
-                });
+                // Set to disabled first, then toggle → should enable
+                await cache.setMetricsEnabled(false);
+                const { data } = await POST('/odata/v4/caching-api/Caches(\'caching\')/toggleMetrics', {});
 
                 expect(data.value).to.be.true;
 
@@ -331,14 +331,12 @@ describeFromCds(9, 'Caching API Service', () => {
             })
 
             it("should disable metrics", async () => {
-                // Enable first
+                // Enable first, then toggle → should disable
                 await cache.setMetricsEnabled(true);
 
-                const { data } = await POST('/odata/v4/caching-api/Caches(\'caching\')/toggleMetrics', {
-                    enabled: false
-                });
+                const { data } = await POST('/odata/v4/caching-api/Caches(\'caching\')/toggleMetrics', {});
 
-                expect(data.value).to.be.true;
+                expect(data.value).to.be.false;
 
                 // Verify metrics are disabled
                 const config = await cache.getRuntimeConfiguration();
@@ -350,9 +348,9 @@ describeFromCds(9, 'Caching API Service', () => {
         describe('toggleKeyMetrics', () => {
 
             it("should enable key metrics", async () => {
-                const { data } = await POST('/odata/v4/caching-api/Caches(\'caching\')/toggleKeyMetrics', {
-                    enabled: true
-                });
+                // Set to disabled first, then toggle → should enable
+                await cache.setKeyMetricsEnabled(false);
+                const { data } = await POST('/odata/v4/caching-api/Caches(\'caching\')/toggleKeyMetrics', {});
 
                 expect(data.value).to.be.true;
 
@@ -362,14 +360,12 @@ describeFromCds(9, 'Caching API Service', () => {
             })
 
             it("should disable key metrics", async () => {
-                // Enable first
+                // Enable first, then toggle → should disable
                 await cache.setKeyMetricsEnabled(true);
 
-                const { data } = await POST('/odata/v4/caching-api/Caches(\'caching\')/toggleKeyMetrics', {
-                    enabled: false
-                });
+                const { data } = await POST('/odata/v4/caching-api/Caches(\'caching\')/toggleKeyMetrics', {});
 
-                expect(data.value).to.be.true;
+                expect(data.value).to.be.false;
 
                 // Verify key metrics are disabled
                 const config = await cache.getRuntimeConfiguration();
@@ -696,8 +692,9 @@ describeFromCds(9, 'Caching API Service', () => {
             expect(entriesData.value).to.have.length(1);
             expect(entriesData.value[0].entryKey).to.equal("workflow:test");
 
-            // 4. Enable metrics
-            await POST('/odata/v4/caching-api/Caches(\'caching\')/toggleMetrics', { enabled: true });
+            // 4. Enable metrics (ensure disabled first so toggle enables it)
+            await cache.setMetricsEnabled(false);
+            await POST('/odata/v4/caching-api/Caches(\'caching\')/toggleMetrics', {});
 
             // 5. Check metrics
             const { data: metricsData } = await GET('/odata/v4/caching-api/Metrics?$filter=cache eq \'caching\'');

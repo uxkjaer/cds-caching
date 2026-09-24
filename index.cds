@@ -50,12 +50,12 @@ context plugin.cds_caching {
                     $Type         : 'Common.SideEffectsType',
                     TargetEntities: [in]
                 }
-                action   toggleMetrics(enabled: Boolean)                    returns Boolean;
+                action   toggleMetrics()                                     returns Boolean;
                 @Common.SideEffects: {
                     $Type         : 'Common.SideEffectsType',
                     TargetEntities: [in]
                 }
-                action   toggleKeyMetrics(enabled: Boolean)                 returns Boolean;
+                action   toggleKeyMetrics()                                  returns Boolean;
             };
 
         @readonly
