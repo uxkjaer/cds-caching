@@ -1,0 +1,54 @@
+<core:FragmentDefinition
+    xmlns:core="sap.ui.core"
+    xmlns="sap.m"
+    xmlns:macros="sap.fe.macros"
+    xmlns:f="sap.ui.layout.form">
+
+    <VBox class="sapUiSmallMargin">
+
+        <!-- Latency Comparison: 3 Bullet charts side by side -->
+        <Title text="Latency Comparison" titleStyle="H5" class="sapUiTinyMarginBottom" />
+        <HBox wrap="NoWrap" class="sapUiSmallMarginBottom" width="100%">
+            <macros:MicroChart id="avgHitLatencyMicro"  metaPath="@com.sap.vocabularies.UI.v1.Chart#avgHitLatencyChart"  contextPath="/Caches/metrics" size="M" class="sapUiSmallMarginEnd" />
+            <macros:MicroChart id="avgMissLatencyMicro" metaPath="@com.sap.vocabularies.UI.v1.Chart#avgMissLatencyChart" contextPath="/Caches/metrics" size="M" class="sapUiSmallMarginEnd" />
+            <macros:MicroChart id="avgRTLatencyMicro"   metaPath="@com.sap.vocabularies.UI.v1.Chart#avgRTLatencyChart"   contextPath="/Caches/metrics" size="M" />
+        </HBox>
+
+        <!-- Performance Charts -->
+        <Title text="Performance Metrics" titleStyle="H5" class="sapUiTinyMarginBottom" />
+        <HBox wrap="Wrap" class="sapUiSmallMarginBottom" width="100%">
+            <macros:MicroChart id="hitRatioBodyMicro"   metaPath="@com.sap.vocabularies.UI.v1.Chart#hitRatioChart"   contextPath="/Caches/metrics" size="M" class="sapUiSmallMarginEnd" />
+            <macros:MicroChart id="errorRateBodyMicro"  metaPath="@com.sap.vocabularies.UI.v1.Chart#errorRateChart"  contextPath="/Caches/metrics" size="M" />
+        </HBox>
+
+        <!-- Read-Through Details Form -->
+        <f:Form class="sapUiSmallMarginTop">
+            <f:layout>
+                <f:ColumnLayout columnsM="2" columnsL="3" columnsXL="4" labelCellsLarge="12" />
+            </f:layout>
+            <f:formContainers>
+                <f:FormContainer>
+                    <f:formElements>
+                        <macros:FormElement id="hitsElem"         metaPath="hits" />
+                        <macros:FormElement id="missesElem"       metaPath="misses" />
+                        <macros:FormElement id="errorsElem"       metaPath="errors" />
+                        <macros:FormElement id="totalReqElem"     metaPath="totalRequests" />
+                        <macros:FormElement id="hitRatioElem"     metaPath="hitRatio" />
+                        <macros:FormElement id="throughputElem"   metaPath="throughput" />
+                        <macros:FormElement id="errorRateElem"    metaPath="errorRate" />
+                        <macros:FormElement id="efficiencyElem"   metaPath="cacheEfficiency" />
+                        <macros:FormElement id="avgRTElem"        metaPath="avgReadThroughLatency" />
+                        <macros:FormElement id="avgHitElem"       metaPath="avgHitLatency" />
+                        <macros:FormElement id="minHitElem"       metaPath="minHitLatency" />
+                        <macros:FormElement id="maxHitElem"       metaPath="maxHitLatency" />
+                        <macros:FormElement id="avgMissElem"      metaPath="avgMissLatency" />
+                        <macros:FormElement id="minMissElem"      metaPath="minMissLatency" />
+                        <macros:FormElement id="maxMissElem"      metaPath="maxMissLatency" />
+                    </f:formElements>
+                </f:FormContainer>
+            </f:formContainers>
+        </f:Form>
+
+    </VBox>
+
+</core:FragmentDefinition>

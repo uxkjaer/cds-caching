@@ -150,7 +150,22 @@
                     "options": {
                         "settings": {
                             "entitySet": "Metrics",
-                            "contextPath": "/Caches/metrics"
+                            "contextPath": "/Caches/metrics",
+                            "content": {
+                                "body": {
+                                    "sections": {
+                                        "ReadThroughChartsSection": {
+                                            "title": "Read-Through Performance",
+                                            "template": "cds.plugin.caching.dashboardfe.ext.MetricsReadThroughCharts"
+                                        },
+                                        "NativeChartsSection": {
+                                            "title": "Native Function Performance",
+                                            "template": "cds.plugin.caching.dashboardfe.ext.MetricsNativeCharts",
+                                            "position": { "placement": "After", "anchor": "ReadThroughChartsSection" }
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }

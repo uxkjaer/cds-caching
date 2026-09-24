@@ -1,0 +1,49 @@
+<core:FragmentDefinition
+    xmlns:core="sap.ui.core"
+    xmlns="sap.m"
+    xmlns:macros="sap.fe.macros"
+    xmlns:f="sap.ui.layout.form">
+
+    <VBox class="sapUiSmallMargin">
+
+        <!-- Native Performance Charts -->
+        <Title text="Native Performance" titleStyle="H5" class="sapUiTinyMarginBottom" />
+        <HBox wrap="Wrap" class="sapUiSmallMarginBottom" width="100%">
+            <macros:MicroChart
+                id="nativeThroughputMicro"
+                metaPath="@com.sap.vocabularies.UI.v1.Chart#nativeThroughputChart"
+                contextPath="/Caches/metrics"
+                size="M"
+                class="sapUiSmallMarginEnd" />
+            <macros:MicroChart
+                id="nativeErrorRateMicro"
+                metaPath="@com.sap.vocabularies.UI.v1.Chart#nativeErrorRateChart"
+                contextPath="/Caches/metrics"
+                size="M" />
+        </HBox>
+
+        <!-- Native Function Details Form -->
+        <f:Form class="sapUiSmallMarginTop">
+            <f:layout>
+                <f:ColumnLayout columnsM="2" columnsL="3" columnsXL="4" labelCellsLarge="12" />
+            </f:layout>
+            <f:formContainers>
+                <f:FormContainer>
+                    <f:formElements>
+                        <macros:FormElement id="nativeSetsElem"       metaPath="nativeSets" />
+                        <macros:FormElement id="nativeGetsElem"       metaPath="nativeGets" />
+                        <macros:FormElement id="nativeDeletesElem"    metaPath="nativeDeletes" />
+                        <macros:FormElement id="nativeClearsElem"     metaPath="nativeClears" />
+                        <macros:FormElement id="nativeTagDeletesElem" metaPath="nativeDeleteByTags" />
+                        <macros:FormElement id="nativeErrorsElem"     metaPath="nativeErrors" />
+                        <macros:FormElement id="totalNativeElem"      metaPath="totalNativeOperations" />
+                        <macros:FormElement id="nativeThroughElem"    metaPath="nativeThroughput" />
+                        <macros:FormElement id="nativeErrRateElem"    metaPath="nativeErrorRate" />
+                    </f:formElements>
+                </f:FormContainer>
+            </f:formContainers>
+        </f:Form>
+
+    </VBox>
+
+</core:FragmentDefinition>

@@ -127,32 +127,101 @@ annotate S.KeyMetrics with @(
     ]
 );
 
-// ─── METRICS SUB-OBJECT PAGE — MICROCHARTS ───────────────────────────────────
+// ─── METRICS SUB-OBJECT PAGE ─────────────────────────────────────────────────
 
 annotate S.Metrics with @(
 
+    // ── DataPoints ── with CriticalityCalculation matching formatter.ts thresholds
+
+    // Hit Ratio: Good ≥ 90, Critical ≥ 70, Error < 70 (Maximize)
     UI.DataPoint #hitRatio: {
         Value      : hitRatio,
         Title      : 'Hit Ratio',
-        TargetValue: 100
-    },
-    UI.DataPoint #errorRate: {
-        Value: errorRate,
-        Title: 'Error Rate'
-    },
-    UI.DataPoint #throughput: {
-        Value: throughput,
-        Title: 'Throughput'
-    },
-    UI.DataPoint #avgHitLatency: {
-        Value: avgHitLatency,
-        Title: 'Avg Hit Latency'
-    },
-    UI.DataPoint #avgMissLatency: {
-        Value: avgMissLatency,
-        Title: 'Avg Miss Latency'
+        TargetValue: 100,
+        CriticalityCalculation: {
+            $Type                   : 'UI.CriticalityCalculationType',
+            ImprovementDirection    : #Maximize,
+            ToleranceRangeLowValue  : 70,
+            DeviationRangeLowValue  : 90
+        }
     },
 
+    // Error Rate: Good ≤ 1%, Critical ≤ 5%, Error > 5% (Minimize)
+    UI.DataPoint #errorRate: {
+        Value: errorRate,
+        Title: 'Error Rate %',
+        CriticalityCalculation: {
+            $Type                    : 'UI.CriticalityCalculationType',
+            ImprovementDirection     : #Minimize,
+            ToleranceRangeHighValue  : 1,
+            DeviationRangeHighValue  : 5
+        }
+    },
+
+    // Cache Efficiency: Good > 5, Critical ≥ 3, Error < 3 (Maximize)
+    UI.DataPoint #cacheEfficiencyKPI: {
+        Value: cacheEfficiency,
+        Title: 'Cache Efficiency',
+        CriticalityCalculation: {
+            $Type                   : 'UI.CriticalityCalculationType',
+            ImprovementDirection    : #Maximize,
+            ToleranceRangeLowValue  : 3,
+            DeviationRangeLowValue  : 5
+        }
+    },
+
+    // Throughput: plain KPI (no threshold defined in formatter)
+    UI.DataPoint #throughputKPI: { Value: throughput, Title: 'Throughput (req/s)' },
+    UI.DataPoint #hitsKPI:       { Value: hits,       Title: 'Hits' },
+    UI.DataPoint #missesKPI:     { Value: misses,     Title: 'Misses' },
+
+    // Latency: Good ≤ 10ms, Critical ≤ 50ms, Error > 50ms (Minimize)
+    UI.DataPoint #avgHitLatencyDP: {
+        Value: avgHitLatency,
+        Title: 'Avg Hit Latency',
+        CriticalityCalculation: {
+            $Type                   : 'UI.CriticalityCalculationType',
+            ImprovementDirection    : #Minimize,
+            ToleranceRangeHighValue : 10,
+            DeviationRangeHighValue : 50
+        }
+    },
+    UI.DataPoint #avgMissLatencyDP: {
+        Value: avgMissLatency,
+        Title: 'Avg Miss Latency',
+        CriticalityCalculation: {
+            $Type                   : 'UI.CriticalityCalculationType',
+            ImprovementDirection    : #Minimize,
+            ToleranceRangeHighValue : 10,
+            DeviationRangeHighValue : 50
+        }
+    },
+    UI.DataPoint #avgRTLatencyDP: {
+        Value: avgReadThroughLatency,
+        Title: 'Avg RT Latency',
+        CriticalityCalculation: {
+            $Type                   : 'UI.CriticalityCalculationType',
+            ImprovementDirection    : #Minimize,
+            ToleranceRangeHighValue : 10,
+            DeviationRangeHighValue : 50
+        }
+    },
+
+    UI.DataPoint #nativeThroughputDP: { Value: nativeThroughput, Title: 'Native Throughput' },
+    UI.DataPoint #nativeErrorRateDP: {
+        Value: nativeErrorRate,
+        Title: 'Native Error Rate %',
+        CriticalityCalculation: {
+            $Type                   : 'UI.CriticalityCalculationType',
+            ImprovementDirection    : #Minimize,
+            ToleranceRangeHighValue : 1,
+            DeviationRangeHighValue : 5
+        }
+    },
+
+    // ── Charts ──
+
+    // Header: Donut for hit ratio
     UI.Chart #hitRatioChart: {
         $Type            : 'UI.ChartDefinitionType',
         Title            : 'Hit Ratio',
@@ -165,22 +234,11 @@ annotate S.Metrics with @(
             DataPoint: '@UI.DataPoint#hitRatio'
         }]
     },
-    UI.Chart #throughputChart: {
-        $Type            : 'UI.ChartDefinitionType',
-        Title            : 'Throughput',
-        ChartType        : #Column,
-        Measures         : [throughput],
-        Dimensions       : [timestamp],
-        MeasureAttributes: [{
-            $Type    : 'UI.ChartMeasureAttributeType',
-            Measure  : throughput,
-            Role     : #Axis1,
-            DataPoint: '@UI.DataPoint#throughput'
-        }]
-    },
+
+    // Header: Bullet for error rate
     UI.Chart #errorRateChart: {
         $Type            : 'UI.ChartDefinitionType',
-        Title            : 'Error Rate',
+        Title            : 'Error Rate %',
         ChartType        : #Bullet,
         Measures         : [errorRate],
         MeasureAttributes: [{
@@ -190,80 +248,117 @@ annotate S.Metrics with @(
             DataPoint: '@UI.DataPoint#errorRate'
         }]
     },
-    UI.Chart #latencyChart: {
+
+    // Body section charts: 3 Bullet charts for latency comparison (renders as horizontal bars)
+    UI.Chart #avgHitLatencyChart: {
         $Type            : 'UI.ChartDefinitionType',
-        Title            : 'Hit vs Miss Latency',
-        ChartType        : #Bar,
-        Measures         : [avgHitLatency, avgMissLatency],
-        MeasureAttributes: [
-            {
-                $Type    : 'UI.ChartMeasureAttributeType',
-                Measure  : avgHitLatency,
-                Role     : #Axis1,
-                DataPoint: '@UI.DataPoint#avgHitLatency'
-            },
-            {
-                $Type    : 'UI.ChartMeasureAttributeType',
-                Measure  : avgMissLatency,
-                Role     : #Axis1,
-                DataPoint: '@UI.DataPoint#avgMissLatency'
-            }
-        ]
+        Title            : 'Avg Hit Latency (ms)',
+        ChartType        : #Bullet,
+        Measures         : [avgHitLatency],
+        MeasureAttributes: [{
+            $Type    : 'UI.ChartMeasureAttributeType',
+            Measure  : avgHitLatency,
+            Role     : #Axis1,
+            DataPoint: '@UI.DataPoint#avgHitLatencyDP'
+        }]
+    },
+    UI.Chart #avgMissLatencyChart: {
+        $Type            : 'UI.ChartDefinitionType',
+        Title            : 'Avg Miss Latency (ms)',
+        ChartType        : #Bullet,
+        Measures         : [avgMissLatency],
+        MeasureAttributes: [{
+            $Type    : 'UI.ChartMeasureAttributeType',
+            Measure  : avgMissLatency,
+            Role     : #Axis1,
+            DataPoint: '@UI.DataPoint#avgMissLatencyDP'
+        }]
+    },
+    UI.Chart #avgRTLatencyChart: {
+        $Type            : 'UI.ChartDefinitionType',
+        Title            : 'Avg RT Latency (ms)',
+        ChartType        : #Bullet,
+        Measures         : [avgReadThroughLatency],
+        MeasureAttributes: [{
+            $Type    : 'UI.ChartMeasureAttributeType',
+            Measure  : avgReadThroughLatency,
+            Role     : #Axis1,
+            DataPoint: '@UI.DataPoint#avgRTLatencyDP'
+        }]
     },
 
+    // Body section charts: Native performance
+    UI.Chart #nativeThroughputChart: {
+        $Type            : 'UI.ChartDefinitionType',
+        Title            : 'Native Throughput (ops/s)',
+        ChartType        : #Bullet,
+        Measures         : [nativeThroughput],
+        MeasureAttributes: [{
+            $Type    : 'UI.ChartMeasureAttributeType',
+            Measure  : nativeThroughput,
+            Role     : #Axis1,
+            DataPoint: '@UI.DataPoint#nativeThroughputDP'
+        }]
+    },
+    UI.Chart #nativeErrorRateChart: {
+        $Type            : 'UI.ChartDefinitionType',
+        Title            : 'Native Error Rate %',
+        ChartType        : #Bullet,
+        Measures         : [nativeErrorRate],
+        MeasureAttributes: [{
+            $Type    : 'UI.ChartMeasureAttributeType',
+            Measure  : nativeErrorRate,
+            Role     : #Axis1,
+            DataPoint: '@UI.DataPoint#nativeErrorRateDP'
+        }]
+    },
+
+    // ── Header Facets (compact: 2 charts + 4 key KPI numbers) ──
     UI.HeaderFacets: [
-        { $Type: 'UI.ReferenceFacet', ID: 'HitRatioChart',   Target: '@UI.Chart#hitRatioChart',   Label: 'Hit Ratio' },
-        { $Type: 'UI.ReferenceFacet', ID: 'ThroughputChart', Target: '@UI.Chart#throughputChart', Label: 'Throughput' },
-        { $Type: 'UI.ReferenceFacet', ID: 'ErrorRateChart',  Target: '@UI.Chart#errorRateChart',  Label: 'Error Rate' },
-        { $Type: 'UI.ReferenceFacet', ID: 'LatencyChart',    Target: '@UI.Chart#latencyChart',    Label: 'Latency' }
+        { $Type: 'UI.ReferenceFacet', ID: 'HitRatioChart',     Target: '@UI.Chart#hitRatioChart',        Label: 'Hit Ratio' },
+        { $Type: 'UI.ReferenceFacet', ID: 'ErrorRateChart',    Target: '@UI.Chart#errorRateChart',       Label: 'Error Rate' },
+        { $Type: 'UI.ReferenceFacet', ID: 'CacheEfficiency',   Target: '@UI.DataPoint#cacheEfficiencyKPI' },
+        { $Type: 'UI.ReferenceFacet', ID: 'Throughput',        Target: '@UI.DataPoint#throughputKPI' },
+        { $Type: 'UI.ReferenceFacet', ID: 'Hits',              Target: '@UI.DataPoint#hitsKPI' },
+        { $Type: 'UI.ReferenceFacet', ID: 'Misses',            Target: '@UI.DataPoint#missesKPI' }
     ],
 
-    UI.Facets: [
-        {
-            $Type : 'UI.CollectionFacet',
-            ID    : 'ReadThroughSection',
-            Label : 'Read-Through Performance',
-            Facets: [{ $Type: 'UI.ReferenceFacet', Target: '@UI.FieldGroup#ReadThrough' }]
-        },
-        {
-            $Type : 'UI.CollectionFacet',
-            ID    : 'NativeSection',
-            Label : 'Native Function Performance',
-            Facets: [{ $Type: 'UI.ReferenceFacet', Target: '@UI.FieldGroup#NativeOps' }]
-        }
-    ],
+    // ── Body: fully custom sections replace annotation-driven FieldGroups ──
+    UI.Facets: [],
 
     UI.FieldGroup #ReadThrough: {
+        Label: 'Read-Through Details',
         Data: [
-            { $Type: 'UI.DataField', Value: hits },
-            { $Type: 'UI.DataField', Value: misses },
-            { $Type: 'UI.DataField', Value: errors },
-            { $Type: 'UI.DataField', Value: totalRequests },
-            { $Type: 'UI.DataField', Value: hitRatio },
-            { $Type: 'UI.DataField', Value: throughput },
-            { $Type: 'UI.DataField', Value: errorRate },
-            { $Type: 'UI.DataField', Value: cacheEfficiency },
-            { $Type: 'UI.DataField', Value: avgReadThroughLatency },
-            { $Type: 'UI.DataField', Value: avgHitLatency },
-            { $Type: 'UI.DataField', Value: minHitLatency },
-            { $Type: 'UI.DataField', Value: maxHitLatency },
-            { $Type: 'UI.DataField', Value: avgMissLatency },
-            { $Type: 'UI.DataField', Value: minMissLatency },
-            { $Type: 'UI.DataField', Value: maxMissLatency }
+            { $Type: 'UI.DataField', Value: hits,                  Label: 'Hits' },
+            { $Type: 'UI.DataField', Value: misses,                Label: 'Misses' },
+            { $Type: 'UI.DataField', Value: errors,                Label: 'Errors' },
+            { $Type: 'UI.DataField', Value: totalRequests,         Label: 'Total Requests' },
+            { $Type: 'UI.DataField', Value: hitRatio,              Label: 'Hit Ratio %' },
+            { $Type: 'UI.DataField', Value: throughput,            Label: 'Throughput (req/s)' },
+            { $Type: 'UI.DataField', Value: errorRate,             Label: 'Error Rate %' },
+            { $Type: 'UI.DataField', Value: cacheEfficiency,       Label: 'Cache Efficiency (x)' },
+            { $Type: 'UI.DataField', Value: avgReadThroughLatency, Label: 'Avg RT Latency (ms)' },
+            { $Type: 'UI.DataField', Value: avgHitLatency,         Label: 'Avg Hit Latency (ms)' },
+            { $Type: 'UI.DataField', Value: minHitLatency,         Label: 'Min Hit Latency (ms)' },
+            { $Type: 'UI.DataField', Value: maxHitLatency,         Label: 'Max Hit Latency (ms)' },
+            { $Type: 'UI.DataField', Value: avgMissLatency,        Label: 'Avg Miss Latency (ms)' },
+            { $Type: 'UI.DataField', Value: minMissLatency,        Label: 'Min Miss Latency (ms)' },
+            { $Type: 'UI.DataField', Value: maxMissLatency,        Label: 'Max Miss Latency (ms)' }
         ]
     },
 
     UI.FieldGroup #NativeOps: {
+        Label: 'Native Function Details',
         Data: [
-            { $Type: 'UI.DataField', Value: nativeSets },
-            { $Type: 'UI.DataField', Value: nativeGets },
-            { $Type: 'UI.DataField', Value: nativeDeletes },
-            { $Type: 'UI.DataField', Value: nativeClears },
-            { $Type: 'UI.DataField', Value: nativeDeleteByTags },
-            { $Type: 'UI.DataField', Value: nativeErrors },
-            { $Type: 'UI.DataField', Value: totalNativeOperations },
-            { $Type: 'UI.DataField', Value: nativeThroughput },
-            { $Type: 'UI.DataField', Value: nativeErrorRate }
+            { $Type: 'UI.DataField', Value: nativeSets,           Label: 'Sets' },
+            { $Type: 'UI.DataField', Value: nativeGets,           Label: 'Gets' },
+            { $Type: 'UI.DataField', Value: nativeDeletes,        Label: 'Deletes' },
+            { $Type: 'UI.DataField', Value: nativeClears,         Label: 'Clears' },
+            { $Type: 'UI.DataField', Value: nativeDeleteByTags,   Label: 'Delete By Tags' },
+            { $Type: 'UI.DataField', Value: nativeErrors,         Label: 'Native Errors' },
+            { $Type: 'UI.DataField', Value: totalNativeOperations,Label: 'Total Native Ops' },
+            { $Type: 'UI.DataField', Value: nativeThroughput,     Label: 'Native Throughput (ops/s)' },
+            { $Type: 'UI.DataField', Value: nativeErrorRate,      Label: 'Native Error Rate %' }
         ]
     }
 );
