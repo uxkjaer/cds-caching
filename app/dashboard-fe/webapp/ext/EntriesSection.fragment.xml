@@ -15,28 +15,28 @@
             type="Emphasized"
             press=".extension.cds.plugin.caching.dashboardfe.ext.ObjectPageExtension.onLoadCacheEntries"
             class="sapUiSmallMarginBottom" />
-        <Table
-            id="entriesTable"
-            items="{entriesModel>/entries}"
-            visible="{= ${entriesModel>/entries/length} > 0 }"
-            noDataText="No cache entries found">
-            <columns>
-                <Column><Text text="{i18n>colKey}" /></Column>
-                <Column><Text text="{i18n>colValue}" /></Column>
-                <Column><Text text="{i18n>colTags}" /></Column>
-                <Column><Text text="{i18n>colTimestamp}" /></Column>
-            </columns>
-            <items>
-                <ColumnListItem>
-                    <cells>
-                        <Text text="{entriesModel>entryKey}" />
-                        <Text text="{entriesModel>value}" />
-                        <Text text="{entriesModel>tags}" />
-                        <Text text="{entriesModel>timestamp}" />
-                    </cells>
-                </ColumnListItem>
-            </items>
-        </Table>
+
+        <!-- VBox binding context set programmatically from function result; table binds to {value} -->
+        <VBox id="entriesResultContainer">
+            <Table id="entriesTable" items="{value}" noDataText="No cache entries found">
+                <columns>
+                    <Column><Text text="{i18n>colKey}" /></Column>
+                    <Column><Text text="{i18n>colValue}" /></Column>
+                    <Column><Text text="{i18n>colTags}" /></Column>
+                    <Column><Text text="{i18n>colTimestamp}" /></Column>
+                </columns>
+                <items>
+                    <ColumnListItem>
+                        <cells>
+                            <Text text="{entryKey}" />
+                            <Text text="{value}" />
+                            <Text text="{tags}" />
+                            <Text text="{timestamp}" />
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </VBox>
     </l:VerticalLayout>
 
 </core:FragmentDefinition>

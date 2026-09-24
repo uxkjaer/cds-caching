@@ -1,29 +1,26 @@
 sap.ui.define([
     "sap/ui/core/mvc/ControllerExtension",
-    "sap/ui/model/json/JSONModel",
     "sap/m/MessageBox",
     "sap/m/MessageToast"
-], function (ControllerExtension, JSONModel, MessageBox, MessageToast) {
+], function (ControllerExtension, MessageBox, MessageToast) {
     "use strict";
 
     return ControllerExtension.extend("cds.plugin.caching.dashboardfe.ext.ObjectPageExtension", {
 
-        override: {
-            onInit: function () {
-                this.base.getView().setModel(new JSONModel({ entries: [] }), "entriesModel");
-            }
-        },
+        onLoadCacheEntries: function (oEvent) {
+            const oContext = this.base.getView().getBindingContext();
+            const oModel   = this.base.getView().getModel();
+            // Traverse from button → VerticalLayout → VBox → Table (avoids FE prefixed ID issue)
+            const oTable   = oEvent.getSource().getParent().getItems()[2].getItems()[0];
 
-        onLoadCacheEntries: function () {
-            const oContext   = this.base.getView().getBindingContext();
-            const oModel     = this.base.getView().getModel();
-            const oFnBinding = oModel.bindContext("plugin.cds_caching.CachingApiService.getEntries(...)", oContext, { $$inheritExpandSelect: false });
-            oFnBinding.setParameter("top",  100);
-            oFnBinding.setParameter("skip", 0);
-            oFnBinding.execute().then(() => {
-                const oResult  = oFnBinding.getBoundContext().getObject();
-                const aEntries = Array.isArray(oResult) ? oResult : (oResult ? [oResult] : []);
-                this.base.getView().getModel("entriesModel").setProperty("/entries", aEntries);
+            if (!this._oEntriesBinding) {
+                this._oEntriesBinding = oModel.bindContext(
+                    "plugin.cds_caching.CachingApiService.getEntries(...)",
+                    oContext
+                );
+            }
+            this._oEntriesBinding.execute().then(() => {
+                oTable.setBindingContext(this._oEntriesBinding.getBoundContext());
             }).catch((oErr) => {
                 MessageBox.error("Failed to load entries: " + (oErr.message || String(oErr)));
             });
