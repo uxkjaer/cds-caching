@@ -28,8 +28,8 @@ context plugin.cds_caching {
         entity Caches     as projection on plugin.cds_caching.Caches
             actions {
 
-                function getEntries(top: Integer, skip: Integer) returns array of CacheEntry;
-                function getEntry(key: String)                   returns CacheEntry;
+                function getEntries(top: Integer, skip: Integer)            returns array of CacheEntry;
+                function getEntry(key: String)                              returns CacheEntry;
 
                 action   setEntry(key: String, value: String, ttl: Integer) returns Boolean;
                 action   deleteEntry(key: String)                           returns Boolean;
@@ -50,12 +50,12 @@ context plugin.cds_caching {
                     $Type         : 'Common.SideEffectsType',
                     TargetEntities: [in]
                 }
-                action   toggleMetrics()                                     returns Boolean;
+                action   toggleMetrics()                                    returns Boolean;
                 @Common.SideEffects: {
                     $Type         : 'Common.SideEffectsType',
                     TargetEntities: [in]
                 }
-                action   toggleKeyMetrics()                                  returns Boolean;
+                action   toggleKeyMetrics()                                 returns Boolean;
             };
 
         @readonly
@@ -71,6 +71,16 @@ context plugin.cds_caching {
 }
 
 extend projection plugin.cds_caching.CachingApiService.Caches with {
-    case when metricsEnabled    = true then 3 else 1 end as metricsStatus    : Integer,
-    case when keyMetricsEnabled = true then 3 else 1 end as keyMetricsStatus : Integer
+    @UI.Hidden
+    case
+        when metricsEnabled = true
+             then 3
+        else 1
+    end as metricsStatus    : Integer,
+    @UI.Hidden
+    case
+        when keyMetricsEnabled = true
+             then 3
+        else 1
+    end as keyMetricsStatus : Integer
 }
