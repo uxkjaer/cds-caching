@@ -11,7 +11,7 @@ sap.ui.define([
             const oContext = this.base.getView().getBindingContext();
             const oModel   = this.base.getView().getModel();
             // Traverse from button → VerticalLayout → VBox → Table (avoids FE prefixed ID issue)
-            const oTable   = oEvent.getSource().getParent().getItems()[2].getItems()[0];
+            const oTable   = oEvent.getSource().getParent().getContent()[2];
 
             if (!this._oEntriesBinding) {
                 this._oEntriesBinding = oModel.bindContext(
