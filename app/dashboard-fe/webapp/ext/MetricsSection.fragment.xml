@@ -5,6 +5,7 @@
     <macros:Table
         id="metricsTable"
         metaPath="metrics/@com.sap.vocabularies.UI.v1.LineItem"
-        readOnly="true" />
+        readOnly="true"
+        type="GridTable" />
 
 </core:FragmentDefinition>
